@@ -1,50 +1,61 @@
-import AppLayout from '@/Layouts/AppLayout';
-import { Badge } from '@/Components/UI/Badge';
-import { Card } from '@/Components/UI/Card';
-import { EmptyState } from '@/Components/UI/EmptyState';
-import { FilterPills } from '@/Components/UI/FilterPills';
-import { PageHeader } from '@/Components/UI/PageHeader';
-import { SearchInput } from '@/Components/UI/SearchInput';
-import { TableWrapper } from '@/Components/UI/TableWrapper';
-import { Paginated, Student } from '@/types';
+import { useState } from 'react';
+import { Filter, Search } from 'lucide-react';
 
-export default function StudentsIndex({ students }: { students: Paginated<Student> }) {
+import StudentInfoCard from '@/Components/Features/Students/StudentInfoCard';
+import StudentNotesCard from '@/Components/Features/Students/StudentNotesCard';
+import StudentPerformanceCard from '@/Components/Features/Students/StudentPerformanceCard';
+import StudentProfileHeader from '@/Components/Features/Students/StudentProfileHeader';
+import StudentTable from '@/Components/Features/Students/StudentTable';
+import StudentTasksCard from '@/Components/Features/Students/StudentTasksCard';
+import { students } from '@/data/mockData';
+import { Student } from '@/types';
+
+export default function StudentsPage() {
+    const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+
+    if (selectedStudent) {
+        return (
+            <div className="animate-in space-y-6 fade-in slide-in-from-bottom-4 duration-500">
+                <StudentProfileHeader student={selectedStudent} onBack={() => setSelectedStudent(null)} />
+
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                    <div className="space-y-6">
+                        <StudentInfoCard student={selectedStudent} />
+                        <StudentNotesCard student={selectedStudent} />
+                    </div>
+
+                    <div className="space-y-6 lg:col-span-2">
+                        <StudentPerformanceCard student={selectedStudent} />
+                        <StudentTasksCard />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <AppLayout title="Alunos">
-            <PageHeader title="Alunos" description="Cadastro individual dos alunos, status pedagógico e vínculo com turmas." />
-            <Card className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                <SearchInput placeholder="Buscar por nome, nível ou contato" />
-                <FilterPills items={[{ label: 'Todos', active: true }, { label: 'Excelente' }, { label: 'Bom' }, { label: 'Atenção' }]} />
-            </Card>
-            {students.data.length === 0 ? (
-                <EmptyState title="Nenhum aluno encontrado" description="Os seeders já deixam a base pronta. Depois, ligue os formulários para cadastro real." />
-            ) : (
-                <TableWrapper>
-                    <table className="min-w-full text-left text-sm">
-                        <thead className="bg-slate-50 text-slate-500">
-                            <tr>
-                                <th className="px-4 py-3">Aluno</th>
-                                <th className="px-4 py-3">Nível</th>
-                                <th className="px-4 py-3">Status</th>
-                                <th className="px-4 py-3">Turmas</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {students.data.map((student) => (
-                                <tr key={student.id} className="border-t border-slate-100">
-                                    <td className="px-4 py-4">
-                                        <p className="font-medium text-slate-900">{student.name}</p>
-                                        <p className="text-slate-500">{student.email_contact}</p>
-                                    </td>
-                                    <td className="px-4 py-4 text-slate-600">{student.level}</td>
-                                    <td className="px-4 py-4"><Badge variant={student.status}>{student.status}</Badge></td>
-                                    <td className="px-4 py-4 text-slate-600">{student.school_classes?.map((item) => item.name).join(', ')}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </TableWrapper>
-            )}
-        </AppLayout>
+        <div className="animate-in space-y-6 fade-in duration-500">
+            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+                <div>
+                    <h1 className="text-2xl font-bold text-slate-800">Alunos</h1>
+                    <p className="mt-1 text-slate-500">Gerencie e acompanhe o desempenho dos seus alunos.</p>
+                </div>
+                <div className="flex w-full gap-3 sm:w-auto">
+                    <div className="relative flex-1 sm:w-64">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                        <input
+                            type="text"
+                            placeholder="Buscar aluno..."
+                            className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                        />
+                    </div>
+                    <button className="rounded-xl border border-slate-200 bg-white p-2.5 text-slate-600 transition-colors hover:bg-slate-50">
+                        <Filter size={18} />
+                    </button>
+                </div>
+            </div>
+
+            <StudentTable students={students} onSelectStudent={setSelectedStudent} />
+        </div>
     );
 }

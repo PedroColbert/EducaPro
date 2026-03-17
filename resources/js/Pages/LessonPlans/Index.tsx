@@ -1,55 +1,30 @@
-import AppLayout from '@/Layouts/AppLayout';
-import { Card } from '@/Components/UI/Card';
-import { ModalShell } from '@/Components/UI/ModalShell';
-import { PageHeader } from '@/Components/UI/PageHeader';
-import { LessonPlan, Material } from '@/types';
-import { formatDate } from '@/lib/utils';
+import { Plus } from 'lucide-react';
 
-export default function LessonPlansIndex({ plans, materials }: { plans: LessonPlan[]; materials: Material[] }) {
-    const selected = plans[0];
+import LessonPlanCard from '@/Components/Features/LessonPlans/LessonPlanCard';
+import LessonPlanQuickEditor from '@/Components/Features/LessonPlans/LessonPlanQuickEditor';
+import { lessonPlans } from '@/data/mockData';
 
+export default function LessonPlansPage() {
     return (
-        <AppLayout title="Planos de aula">
-            <PageHeader title="Planos de aula" description="Planejamento em duas colunas, com preview rápido e acoplamento de materiais." />
-            <div className="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
-                <Card className="space-y-3">
-                    {plans.map((plan) => (
-                        <div key={plan.id} className="rounded-2xl border border-slate-200 px-4 py-3">
-                            <p className="font-medium text-slate-900">{plan.topic}</p>
-                            <p className="text-sm text-slate-500">{formatDate(plan.planned_for)} • {plan.status}</p>
-                        </div>
-                    ))}
-                </Card>
-                <div className="space-y-4">
-                    <Card className="space-y-4">
-                        <div>
-                            <p className="text-sm text-slate-500">Preview do plano</p>
-                            <h2 className="text-2xl font-semibold text-slate-900">{selected?.topic}</h2>
-                            <p className="text-sm text-slate-500">{selected?.school_class?.name}</p>
-                        </div>
-                        <div className="grid gap-3 md:grid-cols-2">
-                            <div className="rounded-2xl bg-slate-50 p-4">
-                                <p className="text-sm font-medium text-slate-700">Objetivos</p>
-                                <p className="mt-2 text-sm text-slate-500">{selected?.objectives?.join(', ')}</p>
-                            </div>
-                            <div className="rounded-2xl bg-slate-50 p-4">
-                                <p className="text-sm font-medium text-slate-700">Conteúdo</p>
-                                <p className="mt-2 text-sm text-slate-500">{selected?.content?.join(', ')}</p>
-                            </div>
-                        </div>
-                    </Card>
-                    <ModalShell title="Adicionar material ao plano">
-                        <div className="grid gap-3 md:grid-cols-2">
-                            {materials.map((material) => (
-                                <div key={material.id} className="rounded-2xl border border-slate-200 px-4 py-3">
-                                    <p className="font-medium text-slate-900">{material.title}</p>
-                                    <p className="text-sm text-slate-500">{material.category} • {material.type}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </ModalShell>
+        <div className="animate-in space-y-6 fade-in duration-500">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-bold text-slate-800">Plano de Aulas</h1>
+                    <p className="mt-1 text-slate-500">Organize seus conteúdos e materiais para as próximas aulas.</p>
                 </div>
+                <button className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 font-medium text-white shadow-sm transition-colors hover:bg-indigo-700">
+                    <Plus size={18} /> Novo Plano
+                </button>
             </div>
-        </AppLayout>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <div className="space-y-4 lg:col-span-2">
+                    {lessonPlans.map((plan) => (
+                        <LessonPlanCard key={plan.id} plan={plan} />
+                    ))}
+                </div>
+                <LessonPlanQuickEditor />
+            </div>
+        </div>
     );
 }

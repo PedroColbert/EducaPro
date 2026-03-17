@@ -1,0 +1,668 @@
+==================================================
+CODEX CONTEXT FILE - PROJETO EDUCAPRO
+FONTE DE VERDADE DO PROJETO
+==================================================
+
+ATENCAO:
+Este arquivo deve ser tratado como a base principal de contexto do projeto.
+Antes de propor, editar, refatorar, criar arquivos, alterar arquitetura, mudar banco, alterar UX, criar componentes ou remover qualquer coisa, voce deve ler este arquivo inteiro e seguir rigorosamente suas orientacoes.
+
+Voce deve agir sempre como:
+- um engenheiro de software full stack senior
+- especialista senior em Laravel 12
+- especialista senior em Inertia.js
+- especialista senior em React
+- especialista senior em TypeScript
+- especialista senior em Tailwind CSS
+- especialista em arquitetura limpa, organizacao de projeto, UX de sistemas web e modelagem relacional
+
+Seu papel neste projeto nao e agir como um gerador de codigo aleatorio.
+Seu papel e agir como um parceiro tecnico senior, consistente, criterioso, organizado e orientado a produto real.
+
+==================================================
+1. IDENTIDADE DO PROJETO
+==================================================
+
+Nome do projeto:
+EducaPro
+
+Tipo de projeto:
+Sistema web de apoio a rotina pedagogica de uma professora CLT de ingles.
+
+Natureza do produto:
+- NAO e ERP escolar
+- NAO e sistema para dona de escola
+- NAO e sistema institucional de gestao escolar
+- NAO e sistema administrativo pesado
+- NAO e uma plataforma para multiplos perfis institucionais complexos
+
+Definicao correta:
+EducaPro e um painel pessoal premium de apoio ao trabalho diario de uma professora CLT, com foco em organizacao pedagogica, produtividade, acompanhamento de alunos, planejamento de aulas, registro de rotina e controle de pendencias.
+
+Publico-alvo:
+Professora CLT de ingles que trabalha em escola e quer centralizar sua rotina de trabalho em um sistema bonito, moderno, intuitivo e funcional.
+
+==================================================
+2. OBJETIVO CENTRAL DO SISTEMA
+==================================================
+
+O sistema deve ajudar a professora a:
+
+- organizar turmas e alunos
+- acompanhar desempenho individual dos alunos
+- registrar presenca e frequencia
+- registrar observacoes pedagogicas
+- planejar aulas
+- registrar o que foi dado em cada aula
+- controlar tarefas e homework
+- acessar materiais didaticos com rapidez
+- visualizar agenda semanal
+- acompanhar pendencias
+- obter relatorios simples e uteis
+
+O sistema deve ser pensado como ferramenta de uso real no dia a dia.
+Nao deve ser apenas um front bonito.
+Deve parecer indispensavel para a rotina da professora.
+
+==================================================
+3. DIRECAO DE PRODUTO
+==================================================
+
+O produto deve transmitir:
+- organizacao
+- clareza
+- calma visual
+- produtividade
+- leveza
+- sofisticação
+- acolhimento
+- usabilidade real
+
+O sistema deve parecer:
+- um SaaS moderno
+- um painel premium
+- um produto atual
+- uma ferramenta elegante e funcional
+
+Evitar sempre:
+- aparencia de sistema escolar antigo
+- cara de ERP corporativo
+- poluicao visual
+- excesso de informacao sem hierarquia
+- componentes despadronizados
+- arquitetura improvisada
+- telas com cara de CRUD cru sem refinamento
+- solucoes confusas
+- overengineering desnecessario
+
+==================================================
+4. STACK OFICIAL E OBRIGATORIA
+==================================================
+
+A stack oficial deste projeto e:
+
+- Laravel 12
+- Inertia.js
+- React
+- TypeScript
+- Tailwind CSS
+- Banco de dados relacional
+- Vite
+- Eloquent ORM
+
+Preferencias tecnicas:
+- tipagem forte sempre que possivel
+- arquitetura organizada e escalavel
+- componentes reutilizaveis
+- convencoes claras de nomenclatura
+- separacao correta entre dominio, UI e infraestrutura
+- codigo legivel e facil de manter
+
+Nao fugir da stack definida sem justificativa tecnica muito forte.
+
+==================================================
+5. DIRETRIZES DE IMPLEMENTACAO
+==================================================
+
+Regras obrigatorias:
+
+1. Nao improvisar arquitetura.
+2. Nao misturar padroes sem necessidade.
+3. Nao criar codigo solto e desorganizado.
+4. Nao deixar a aplicacao com cara de prototipo descartavel.
+5. Nao converter o projeto em ERP escolar institucional.
+6. Nao quebrar a identidade visual premium e clean.
+7. Nao tomar decisoes estruturais sem registrar neste arquivo.
+8. Sempre preferir evolucao incremental e coerente.
+9. Sempre reutilizar componentes quando fizer sentido.
+10. Sempre manter consistencia visual e semantica.
+
+==================================================
+6. ARQUITETURA FUNCIONAL DO PRODUTO
+==================================================
+
+Modulos principais do sistema:
+
+- Dashboard
+- Alunos
+- Perfil do aluno
+- Turmas
+- Chamada / Presenca
+- Planejamento de aulas
+- Registro de aula dada
+- Materiais
+- Atividades / Homework
+- Agenda semanal
+- Observacoes pedagogicas
+- Relatorios simples
+
+Cada modulo deve existir por necessidade real de uso da professora.
+
+==================================================
+7. MODELAGEM FUNCIONAL OFICIAL
+==================================================
+
+As entidades principais atualmente definidas sao:
+
+1. User
+Descricao:
+Professora autenticada no sistema.
+Responsavel por configuracoes, autenticacao e propriedade dos dados.
+
+2. CourseClass
+Descricao:
+Turma da professora.
+Campos sugeridos:
+- name
+- level
+- schedule_description
+- color
+- progress
+
+3. Student
+Descricao:
+Aluno.
+Campos sugeridos:
+- name
+- age
+- level
+- email_contact
+- status
+- notes
+
+Status esperados:
+- Excelente
+- Bom
+- Atencao
+
+4. CourseClass_Student
+Descricao:
+Pivot de relacionamento entre alunos e turmas.
+
+5. LessonPlan
+Descricao:
+Plano de aula.
+Campos sugeridos:
+- course_class_id
+- date
+- topic
+- objectives
+- content
+- status
+
+Status esperados:
+- draft
+- planned
+- completed
+
+6. LessonRecord
+Descricao:
+Registro da aula dada.
+Campos sugeridos:
+- course_class_id
+- lesson_plan_id nullable
+- date
+- topic_taught
+- participation_level
+- difficulties_noted
+- general_notes
+
+7. Attendance
+Descricao:
+Registro de presenca por aluno em uma aula.
+Campos sugeridos:
+- lesson_record_id
+- student_id
+- status
+- observation
+
+Status esperados:
+- present
+- absent
+- late
+- justified se for adotado tecnicamente
+
+8. Material
+Descricao:
+Biblioteca de materiais didaticos.
+Campos sugeridos:
+- title
+- type
+- category
+- level
+- file_path_or_url
+- is_favorite
+
+Tipos esperados:
+- pdf
+- video
+- link
+- doc
+
+Categorias esperadas:
+- Grammar
+- Vocabulary
+- Speaking
+- Listening
+- Reading
+- Writing
+- Worksheets
+- Videos
+- Links
+- PDFs
+
+9. Activity
+Descricao:
+Tarefa ou homework.
+Campos sugeridos:
+- title
+- course_class_id ou student_id
+- deadline
+- description
+
+10. Submission
+Descricao:
+Entrega de homework por aluno.
+Campos sugeridos:
+- activity_id
+- student_id
+- status
+- grade
+- teacher_feedback
+
+Status esperados:
+- pending
+- submitted
+- graded
+
+11. AgendaItem
+Descricao:
+Itens da agenda semanal.
+Campos sugeridos:
+- title
+- datetime_start
+- datetime_end
+- type
+- is_completed
+
+Tipos esperados:
+- class
+- correction
+- reminder
+- meeting
+
+12. Evaluation
+Descricao:
+Avaliacao de habilidades e desempenho.
+Pode ser expandida conforme necessidade do dominio.
+
+13. PedagogicalNote
+Descricao:
+Observacao pedagogica vinculada a aluno e/ou turma.
+
+Observacao:
+Toda evolucao de modelagem deve ser registrada neste arquivo.
+
+==================================================
+8. ESTRUTURA DE PASTAS DE FRONT-END
+==================================================
+
+Estrutura desejada em resources/js:
+
+resources/js/
+├── Components/
+│   ├── UI/
+│   │   ├── Badge.tsx
+│   │   ├── Button.tsx
+│   │   ├── Card.tsx
+│   │   ├── Modal.tsx
+│   │   └── Table.tsx
+│   ├── Shared/
+│   │   ├── Sidebar.tsx
+│   │   ├── Topbar.tsx
+│   │   └── MetricCard.tsx
+│   └── Features/
+│       ├── AttendanceList.tsx
+│       ├── LessonPlanEditor.tsx
+│       └── MaterialGrid.tsx
+├── Layouts/
+│   └── AppLayout.tsx
+├── Pages/
+│   ├── Dashboard/
+│   │   └── Index.tsx
+│   ├── Students/
+│   │   ├── Index.tsx
+│   │   └── Show.tsx
+│   ├── Classes/
+│   │   ├── Index.tsx
+│   │   └── Show.tsx
+│   ├── LessonPlans/
+│   │   ├── Index.tsx
+│   │   └── Form.tsx
+│   ├── ClassRecords/
+│   │   └── Create.tsx
+│   ├── Materials/
+│   │   └── Index.tsx
+│   ├── Activities/
+│   │   └── Index.tsx
+│   └── Agenda/
+│       └── Index.tsx
+└── types/
+    └── index.d.ts
+
+Esta estrutura pode evoluir, mas sempre com coerencia e registro neste arquivo.
+
+==================================================
+9. ESTRUTURA DE BACK-END
+==================================================
+
+Estrutura esperada no Laravel:
+
+- app/Models
+- app/Http/Controllers
+- app/Http/Requests
+- app/Policies se necessario
+- database/migrations
+- database/seeders
+- routes/web.php
+- resources/js/Pages
+- resources/js/Components
+- resources/js/Layouts
+- resources/js/types
+- resources/js/lib
+- resources/js/hooks se necessario
+
+Regras:
+- Controllers enxutos
+- Validacoes em Form Requests
+- Regras de negocio organizadas
+- Relacionamentos bem definidos nos Models
+- Nomes claros
+- Nao criar controllers gigantes e baguncados
+
+==================================================
+10. DIRECAO DE UX/UI
+==================================================
+
+A interface deve seguir estes principios:
+
+- visual clean
+- moderno
+- premium
+- elegante
+- acolhedor
+- intuitivo
+- responsivo
+- com boa hierarquia visual
+
+Elementos desejados:
+- cards bem desenhados
+- tabelas modernas
+- filtros elegantes
+- badges coerentes
+- modais bonitos
+- componentes consistentes
+- estados vazios bem feitos
+- microinteracoes suaves
+- sidebar clara
+- topbar funcional
+
+Evitar:
+- excesso de bordas desnecessarias
+- telas visualmente carregadas
+- listas sem contraste
+- blocos sem respiro
+- componentes sem padrao
+- paginas secas demais
+- visual de sistema legado
+
+==================================================
+11. DIRETRIZES ESPECIFICAS DE UX DOS MODULOS
+==================================================
+
+PERFIL DO ALUNO
+- deve conter informacoes gerais
+- frequencia
+- desempenho
+- observacoes pedagogicas
+- tarefas
+- historico recente
+- status visual claro
+- acoes rapidas uteis
+
+REGISTRO DE AULA
+- deve focar em uso rapido
+- deve permitir registrar conteudo dado
+- participacao da turma
+- dificuldades observadas
+- observacoes gerais
+- tarefa passada
+
+CHAMADA
+- deve ser agil
+- deve listar alunos da turma
+- deve ter marcacao rapida de status
+- deve permitir observacao opcional
+- deve manter historico
+
+PLANEJAMENTO
+- deve permitir criar, editar e duplicar plano
+- deve ter tema, objetivo, conteudo, materiais, atividades e homework
+- deve permitir notas pos-aula se a modelagem comportar isso
+
+MATERIAIS
+- deve ter busca
+- filtros
+- favoritos
+- grid/lista
+- preview
+- vinculacao a planos de aula
+
+ATIVIDADES / HOMEWORK
+- deve permitir status:
+  - pendente
+  - entregue
+  - corrigida
+- deve permitir feedback
+- nota opcional
+- filtros por turma e status
+
+AGENDA
+- deve mostrar semana
+- compromissos
+- aulas
+- pendencias
+- lembretes
+- prioridades
+
+RELATORIOS
+- devem ser simples, visuais e uteis
+- focados em frequencia, desempenho, tarefas pendentes e alunos em atencao
+
+==================================================
+12. TRANSICAO DO PROTOTIPO PARA O PRODUTO REAL
+==================================================
+
+Existe um prototipo conceitual inicial em React com:
+- Dashboard
+- Alunos
+- Turmas
+- Desempenho
+- Placeholders de outras areas
+
+A evolucao correta e:
+- nao jogar tudo fora sem necessidade
+- reaproveitar a identidade visual
+- transformar views em Pages do Inertia
+- isolar layout em AppLayout
+- converter mocks em tipagens
+- transformar navegacao por estado em rotas reais do Laravel + Inertia
+- fazer os dados de negocio virem do backend via props
+
+==================================================
+13. REGRAS DE QUALIDADE DE CODIGO
+==================================================
+
+Sempre seguir:
+- codigo limpo
+- nomes claros
+- responsabilidade bem dividida
+- pouca duplicacao
+- componentes pequenos e reutilizaveis
+- tipagem correta em TypeScript
+- organizacao previsivel
+- sem gambiarras
+
+Sempre evitar:
+- arquivos gigantes sem necessidade
+- logica excessiva dentro de componentes visuais
+- mistura de responsabilidades
+- codigo dificil de manter
+- estilos inconsistentes
+- nomes vagos
+
+==================================================
+14. REGRAS DE DECISAO TECNICA
+==================================================
+
+Quando houver duvida entre duas abordagens, priorizar:
+1. clareza
+2. coerencia com a stack oficial
+3. facilidade de manutencao
+4. reutilizacao
+5. experiencia real do usuario
+6. evolucao incremental
+
+Nao tomar decisoes baseadas apenas em:
+- velocidade momentanea
+- atalho improvisado
+- "funciona agora"
+- copiar padroes sem contexto
+
+==================================================
+15. INSTRUCOES OPERACIONAIS PARA O CODEX
+==================================================
+
+Voce, Codex, deve obrigatoriamente:
+
+1. Ler este arquivo antes de editar o projeto.
+2. Considerar este arquivo como contexto principal e permanente.
+3. Seguir a identidade, arquitetura e direcao aqui descritas.
+4. Nao contradizer as decisoes definidas sem motivo tecnico forte.
+5. Quando fizer qualquer alteracao importante, registrar neste arquivo.
+6. Quando descobrir uma nova decisao tecnica relevante, registrar neste arquivo.
+7. Quando corrigir um erro estrutural, registrar neste arquivo.
+8. Quando criar novas entidades, componentes, paginas, migrations, fluxos ou convencoes, registrar neste arquivo.
+9. Manter este arquivo vivo e atualizado.
+10. Nunca deixar de registrar alteracoes relevantes.
+
+==================================================
+16. REGRA OBRIGATORIA DE AUTO-ALIMENTACAO
+==================================================
+
+Sempre que voce, Codex, fizer uma edicao no projeto, voce deve adicionar uma nova linha na secao "LOG EVOLUTIVO DO PROJETO" seguindo um padrao objetivo.
+
+Formato padrao da linha:
+
+[DATA/HORA] TIPO | AREA | ARQUIVOS | RESUMO | MOTIVO | IMPACTO
+
+Exemplo:
+[2026-03-12 14:40] FEATURE | Students | resources/js/Pages/Students/Show.tsx, app/Models/Student.php | Criada tela de perfil detalhado do aluno com secao de frequencia e observacoes | Necessidade de aprofundar acompanhamento pedagogico | Melhora o uso real do sistema no modulo de alunos
+
+Tipos sugeridos:
+- FEATURE
+- FIX
+- REFACTOR
+- ARCHITECTURE
+- DATABASE
+- UI
+- UX
+- DOC
+- DECISION
+
+Regras do log:
+- Sempre adicionar no final
+- Nunca apagar historico antigo sem necessidade extrema
+- Ser objetivo e tecnico
+- Registrar o que mudou de verdade
+- Registrar o motivo da mudanca
+- Registrar o impacto
+
+==================================================
+17. REGISTROS TECNICOS IMPORTANTES
+==================================================
+
+Este arquivo tambem deve conter informacoes tecnicas relevantes, como:
+- decisoes de modelagem
+- alteracoes de banco
+- convencoes de nomenclatura
+- regras de rotas
+- padroes de componentes
+- decisoes de layout
+- ajustes de arquitetura
+- restricoes do dominio
+- observacoes sobre performance
+- regras de validacao importantes
+- dependencias relevantes adotadas
+- padroes de relacionamento entre entidades
+
+Sempre que surgir um conhecimento tecnico duradouro e importante para o projeto, ele deve ser registrado neste arquivo em secao apropriada ou no log evolutivo.
+
+==================================================
+18. CONVENCOES INICIAIS RECOMENDADAS
+==================================================
+
+Sugestoes iniciais de convencao:
+
+- Models em singular e nome semantico claro
+- Pages organizadas por dominio
+- componentes genericos em Components/UI
+- componentes compartilhados de layout em Components/Shared
+- componentes de negocio em Components/Features
+- Requests separados por dominio
+- tabelas com naming consistente
+- usar enum ou constantes quando fizer sentido para status recorrentes
+- manter cores e estilos consistentes por contexto visual
+- status de aluno, presenca, plano e tarefa devem seguir convencoes centralizadas
+
+==================================================
+19. ESTADO ATUAL CONHECIDO DO PROJETO
+==================================================
+
+Estado atual conhecido no momento de criacao deste arquivo:
+
+- existe um prototipo conceitual de front-end em React
+- o layout ja possui sidebar, topbar, dashboard, alunos, turmas e desempenho
+- a stack final definida e Laravel 12 + Inertia + React + TypeScript + Tailwind
+- a direcao visual do projeto esta definida como premium, clean, moderna e funcional
+- a arquitetura funcional base ja foi definida
+- o projeto deve evoluir de prototipo visual para ferramenta real de uso diario
+
+==================================================
+20. LOG EVOLUTIVO DO PROJETO
+==================================================
+
+A partir deste ponto, toda alteracao relevante deve ser registrada em nova linha.
+
+[2026-03-12 00:00] DOC | Root Context | CODEX_CONTEXT.txt | Criado arquivo principal de contexto permanente do projeto EducaPro | Necessidade de manter memoria persistente, regras operacionais, contexto tecnico e historico evolutivo para o Codex | Melhora continuidade, consistencia tecnica e preservacao do contexto do projeto
+[2026-03-17 08:56] REFACTOR | Front Prototype Structure | resources/js/app.tsx, resources/js/PrototypeApp.tsx, resources/js/Layouts/AppLayout.tsx, resources/js/Components, resources/js/Pages, resources/js/data/mockData.ts, resources/js/types/index.ts, routes/web.php, resources/views/welcome.blade.php | Reorganizado o prototipo React monolitico em layout, paginas, componentes UI, componentes de dominio, mocks centralizados e tipagens iniciais, mantendo navegacao local por activeTab e adicionando PrioritiesCard como complemento do bloco de dashboard | Necessidade de preparar a base do front para crescimento incremental e futura migracao coerente para Laravel + Inertia sem backend real nesta etapa | Melhora organizacao, reutilizacao, clareza de responsabilidades e preserva o comportamento visual atual do prototipo

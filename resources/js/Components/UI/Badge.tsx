@@ -1,20 +1,20 @@
 import { ReactNode } from 'react';
 
-import { cn } from '@/lib/utils';
-
 const variants = {
-    excellent: 'bg-emerald-100 text-emerald-700',
-    good: 'bg-sky-100 text-sky-700',
-    attention: 'bg-amber-100 text-amber-700',
-    neutral: 'bg-slate-100 text-slate-600',
+    default: 'bg-slate-100 text-slate-700',
+    success: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20',
+    warning: 'bg-amber-50 text-amber-700 ring-1 ring-amber-600/20',
+    danger: 'bg-rose-50 text-rose-700 ring-1 ring-rose-600/20',
+    primary: 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-600/20',
+    neutral: 'border border-slate-200 bg-slate-50 text-slate-600',
 };
 
-export function Badge({
+export default function Badge({
     children,
-    variant = 'neutral',
+    variant = 'default',
 }: {
     children: ReactNode;
     variant?: keyof typeof variants;
 }) {
-    return <span className={cn('inline-flex rounded-full px-3 py-1 text-xs font-semibold', variants[variant])}>{children}</span>;
+    return <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${variants[variant]}`}>{children}</span>;
 }

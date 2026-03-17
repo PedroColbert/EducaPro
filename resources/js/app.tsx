@@ -1,27 +1,13 @@
 import '../css/app.css';
 import './bootstrap';
 
-import { createInertiaApp } from '@inertiajs/react';
-import { ComponentType } from 'react';
 import { createRoot } from 'react-dom/client';
+import PrototypeApp from './PrototypeApp';
 
-createInertiaApp({
-    resolve: async (name) => {
-        const pages = import.meta.glob('./Pages/**/*.tsx');
-        const loader = pages[`./Pages/${name}.tsx`];
+const element = document.getElementById('app');
 
-        if (!loader) {
-            throw new Error(`Page not found: ${name}`);
-        }
+if (!element) {
+    throw new Error('Root element "#app" not found.');
+}
 
-        const page = (await loader()) as { default: ComponentType };
-
-        return page.default;
-    },
-    setup({ el, App, props }) {
-        createRoot(el).render(<App {...props} />);
-    },
-    progress: {
-        color: '#0f766e',
-    },
-});
+createRoot(element).render(<PrototypeApp />);
