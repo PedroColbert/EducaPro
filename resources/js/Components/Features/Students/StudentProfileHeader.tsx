@@ -1,14 +1,19 @@
 import { ArrowLeft, BookOpen, CheckCircle2, Edit2, MessageSquare, Users } from 'lucide-react';
 
 import Badge from '@/Components/UI/Badge';
+import { studentStatusMeta } from '@/data/mockData';
 import { Student } from '@/types';
 
 export default function StudentProfileHeader({
     student,
+    classLabel,
     onBack,
+    onEdit,
 }: {
     student: Student;
+    classLabel: string;
     onBack: () => void;
+    onEdit: () => void;
 }) {
     return (
         <>
@@ -26,14 +31,14 @@ export default function StudentProfileHeader({
                 <div className="flex-1">
                     <div className="mb-2 flex items-center gap-3">
                         <h1 className="text-3xl font-bold text-slate-800">{student.name}</h1>
-                        <Badge variant={student.status === 'Atenção' ? 'danger' : 'success'}>{student.status}</Badge>
+                        <Badge variant={studentStatusMeta[student.status].badge}>{studentStatusMeta[student.status].label}</Badge>
                     </div>
                     <div className="flex flex-wrap gap-4 text-sm text-slate-600">
                         <span className="flex items-center gap-1.5">
-                            <Users size={16} className="text-slate-400" /> {student.class}
+                            <Users size={16} className="text-slate-400" /> {classLabel}
                         </span>
                         <span className="flex items-center gap-1.5">
-                            <BookOpen size={16} className="text-slate-400" /> Nível {student.level}
+                            <BookOpen size={16} className="text-slate-400" /> Nivel {student.level}
                         </span>
                         <span className="flex items-center gap-1.5">
                             <CheckCircle2 size={16} className="text-slate-400" /> {student.age} anos
@@ -45,7 +50,7 @@ export default function StudentProfileHeader({
                     <button className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50">
                         <MessageSquare size={16} /> Mensagem
                     </button>
-                    <button className="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-indigo-200 transition-colors hover:bg-indigo-700">
+                    <button onClick={onEdit} className="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-indigo-200 transition-colors hover:bg-indigo-700">
                         <Edit2 size={16} /> Editar Perfil
                     </button>
                 </div>

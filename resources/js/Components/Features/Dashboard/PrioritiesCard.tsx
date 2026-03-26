@@ -1,53 +1,98 @@
-import { AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { AlertTriangle, ArrowRight, Clock3, Sparkles } from 'lucide-react';
 
 import Badge from '@/Components/UI/Badge';
 import Card from '@/Components/UI/Card';
-import { Activity, AppTab } from '@/types';
+import { AppTab } from '@/types';
+
+interface PriorityItem {
+    id: string;
+    title: string;
+    description: string;
+    level: 'critical' | 'attention' | 'normal';
+    module: string;
+    actionLabel: string;
+    actionTab: AppTab;
+}
+
+const levelMeta = {
+    critical: {
+        badge: 'danger',
+        icon: AlertTriangle,
+        iconClass: 'text-rose-500',
+        containerClass: 'border-rose-100 bg-rose-50/60',
+        label: 'Critico',
+    },
+    attention: {
+        badge: 'warning',
+        icon: Clock3,
+        iconClass: 'text-amber-500',
+        containerClass: 'border-amber-100 bg-amber-50/60',
+        label: 'Atencao',
+    },
+    normal: {
+        badge: 'primary',
+        icon: Sparkles,
+        iconClass: 'text-indigo-500',
+        containerClass: 'border-indigo-100 bg-indigo-50/50',
+        label: 'Planejado',
+    },
+} as const;
 
 export default function PrioritiesCard({
     tasks,
     changeTab,
 }: {
-    tasks: Activity[];
+    tasks: PriorityItem[];
     changeTab: (tabId: AppTab) => void;
 }) {
     return (
         <Card>
             <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-bold text-slate-800">Prioridades</h2>
-                <Badge variant="warning">3</Badge>
+                <div>
+                    <h2 className="text-lg font-bold text-slate-800">Prioridades</h2>
+                    <p className="mt-1 text-sm text-slate-500">O painel prioriza o que tende a gerar impacto imediato na rotina.</p>
+                </div>
+                <Badge variant={tasks.some((task) => task.level === 'critical') ? 'danger' : tasks.some((task) => task.level === 'attention') ? 'warning' : 'primary'}>
+                    {tasks.length}
+                </Badge>
             </div>
 
             <div className="space-y-3">
-                {tasks
-                    .filter((task) => task.status === 'grading')
-                    .map((task) => (
-                        <div key={task.id} className="cursor-pointer rounded-xl border border-amber-100 bg-amber-50/50 p-3 transition-colors hover:bg-amber-50">
-                            <div className="flex items-start gap-3">
-                                <div className="mt-0.5 text-amber-500">
-                                    <AlertTriangle size={18} />
-                                </div>
-                                <div>
-                                    <p className="text-sm font-medium text-slate-800">Corrigir: {task.title}</p>
-                                    <p className="mt-0.5 text-xs text-slate-500">
-                                        {task.class} • Prazo: {task.deadline}
-                                    </p>
+                {tasks.length ? (
+                    tasks.map((task) => {
+                        const meta = levelMeta[task.level];
+                        const Icon = meta.icon;
+
+                        return (
+                            <div key={task.id} className={`rounded-2xl border px-4 py-4 transition-colors ${meta.containerClass}`}>
+                                <div className="flex items-start gap-3">
+                                    <div className={`mt-0.5 ${meta.iconClass}`}>
+                                        <Icon size={18} />
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <div className="mb-2 flex flex-wrap items-center gap-2">
+                                            <Badge variant={meta.badge}>{meta.label}</Badge>
+                                            <span className="text-xs font-medium uppercase tracking-[0.16em] text-slate-400">{task.module}</span>
+                                        </div>
+                                        <p className="text-sm font-semibold text-slate-800">{task.title}</p>
+                                        <p className="mt-1 text-sm leading-relaxed text-slate-500">{task.description}</p>
+                                        <button
+                                            onClick={() => changeTab(task.actionTab)}
+                                            className="mt-3 flex items-center gap-1 text-sm font-medium text-indigo-600 transition hover:text-indigo-700"
+                                        >
+                                            {task.actionLabel} <ArrowRight size={14} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
-
-                <div className="cursor-pointer rounded-xl border border-transparent p-3 transition-colors hover:border-slate-100 hover:bg-slate-50">
-                    <div className="flex items-start gap-3">
-                        <div className="mt-0.5 text-slate-400">
-                            <CheckCircle2 size={18} />
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-slate-700">Preparar aula: Modal Verbs</p>
-                            <p className="mt-0.5 text-xs text-slate-500">Turma A2 • Amanhã</p>
-                        </div>
+                        );
+                    })
+                ) : (
+                    <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 px-4 py-4">
+                        <p className="text-sm font-medium text-emerald-800">Nenhuma pendencia critica no momento.</p>
+                        <p className="mt-1 text-sm text-emerald-700">Use a agenda e o planejamento para manter esse ritmo organizado.</p>
                     </div>
-                </div>
+                )}
             </div>
 
             <button

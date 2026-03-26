@@ -3,7 +3,19 @@ import { BookOpen, Calendar, CheckSquare, Folder, MoreVertical, Users } from 'lu
 import Card from '@/Components/UI/Card';
 import { CourseClass } from '@/types';
 
-export default function ClassCard({ courseClass }: { courseClass: CourseClass }) {
+export default function ClassCard({
+    courseClass,
+    studentCount,
+    onEdit,
+    onOpenDetails,
+    onTakeAttendance,
+}: {
+    courseClass: CourseClass;
+    studentCount: number;
+    onEdit: () => void;
+    onOpenDetails: () => void;
+    onTakeAttendance: () => void;
+}) {
     return (
         <Card className="group flex flex-col">
             <div className="mb-4 flex items-start justify-between">
@@ -13,7 +25,7 @@ export default function ClassCard({ courseClass }: { courseClass: CourseClass })
                         <Calendar size={14} /> {courseClass.schedule}
                     </p>
                 </div>
-                <button className="text-slate-400 hover:text-slate-600">
+                <button className="text-slate-400 hover:text-slate-600" onClick={onEdit}>
                     <MoreVertical size={20} />
                 </button>
             </div>
@@ -23,19 +35,19 @@ export default function ClassCard({ courseClass }: { courseClass: CourseClass })
                     <span className="flex items-center gap-1.5 text-slate-600">
                         <Users size={16} className="text-indigo-500" /> Alunos
                     </span>
-                    <span className="font-bold text-slate-800">{courseClass.students}</span>
+                    <span className="font-bold text-slate-800">{studentCount}</span>
                 </div>
                 <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm">
                     <span className="flex items-center gap-1.5 text-slate-600">
-                        <BookOpen size={16} className="text-emerald-500" /> Próximo Tópico
+                        <BookOpen size={16} className="text-emerald-500" /> Proximo topico
                     </span>
-                    <span className="max-w-[120px] truncate font-medium text-slate-700">{courseClass.nextTopic}</span>
+                    <span className="max-w-[140px] truncate font-medium text-slate-700">{courseClass.nextTopic}</span>
                 </div>
             </div>
 
             <div className="mt-auto">
                 <div className="mb-2 flex justify-between text-sm">
-                    <span className="font-medium text-slate-500">Progresso do Semestre</span>
+                    <span className="font-medium text-slate-500">Progresso do semestre</span>
                     <span className="font-bold text-indigo-600">{courseClass.progress}%</span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-slate-100">
@@ -44,10 +56,10 @@ export default function ClassCard({ courseClass }: { courseClass: CourseClass })
             </div>
 
             <div className="mt-6 flex gap-2 border-t border-slate-100 pt-5">
-                <button className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-indigo-50 py-2 text-sm font-medium text-indigo-700 transition-colors hover:bg-indigo-100">
+                <button onClick={onTakeAttendance} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-indigo-50 py-2 text-sm font-medium text-indigo-700 transition-colors hover:bg-indigo-100">
                     <CheckSquare size={16} /> Chamada
                 </button>
-                <button className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-slate-50 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100">
+                <button onClick={onOpenDetails} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-slate-50 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100">
                     <Folder size={16} /> Detalhes
                 </button>
             </div>

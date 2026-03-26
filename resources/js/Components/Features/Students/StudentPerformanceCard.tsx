@@ -2,11 +2,11 @@ import Card from '@/Components/UI/Card';
 import { Student } from '@/types';
 
 export default function StudentPerformanceCard({ student }: { student: Student }) {
-    const writingScore = parseInt(student.attendance, 10) < 80 ? 60 : 88;
+    const writingScore = student.attendanceRate < 80 ? 60 : 88;
 
     return (
         <Card>
-            <h2 className="mb-4 text-lg font-bold text-slate-800">Desempenho por Habilidade</h2>
+            <h2 className="mb-4 text-lg font-bold text-slate-800">Desempenho por habilidade</h2>
             <div className="space-y-4">
                 {[
                     { skill: 'Speaking', value: 85, color: 'bg-indigo-500' },

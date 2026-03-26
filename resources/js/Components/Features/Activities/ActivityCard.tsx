@@ -1,8 +1,22 @@
-import { AlertTriangle, Calendar, CheckCircle2, Clock, Users } from 'lucide-react';
+import { AlertTriangle, Calendar, CheckCircle2, Clock, PenSquare, Users } from 'lucide-react';
 
 import { Activity } from '@/types';
 
-export default function ActivityCard({ activity }: { activity: Activity }) {
+export default function ActivityCard({
+    activity,
+    classLabel,
+    submitted,
+    total,
+    onOpen,
+    onEdit,
+}: {
+    activity: Activity;
+    classLabel: string;
+    submitted: number;
+    total: number;
+    onOpen: () => void;
+    onEdit: () => void;
+}) {
     const icon =
         activity.status === 'grading' ? (
             <AlertTriangle size={18} />
@@ -27,30 +41,34 @@ export default function ActivityCard({ activity }: { activity: Activity }) {
                     <h3 className="font-bold text-slate-800">{activity.title}</h3>
                     <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-slate-500">
                         <span className="flex items-center gap-1">
-                            <Users size={14} /> {activity.class}
+                            <Users size={14} /> {classLabel}
                         </span>
                         <span className="flex items-center gap-1">
-                            <Calendar size={14} /> Prazo: {activity.deadline}
+                            <Calendar size={14} /> Prazo: {new Date(activity.deadline).toLocaleDateString('pt-BR')}
                         </span>
                     </div>
                 </div>
             </div>
 
-            <div className="mt-4 flex w-full items-center gap-6 sm:mt-0 sm:w-auto">
+            <div className="mt-4 flex w-full items-center gap-3 sm:mt-0 sm:w-auto">
                 <div className="flex-1 text-right sm:flex-none">
                     <p className="text-sm font-medium text-slate-700">
-                        {activity.submitted} / {activity.total}
+                        {submitted} / {total}
                     </p>
                     <p className="text-xs text-slate-500">Entregues</p>
                 </div>
+                <button onClick={onEdit} className="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50">
+                    <PenSquare size={16} />
+                </button>
                 <button
+                    onClick={onOpen}
                     className={`whitespace-nowrap rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
                         activity.status === 'grading'
                             ? 'border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100'
                             : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
                     }`}
                 >
-                    {activity.status === 'grading' ? 'Corrigir Agora' : 'Ver Detalhes'}
+                    {activity.status === 'grading' ? 'Corrigir agora' : 'Ver detalhes'}
                 </button>
             </div>
         </div>

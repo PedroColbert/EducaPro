@@ -20,7 +20,9 @@ class EducaProSeeder extends Seeder
 {
     public function run(): void
     {
-        $user = User::query()->firstOrFail();
+        $user = User::query()
+            ->where('email', 'admin@educapro.com')
+            ->firstOrFail();
 
         $classes = collect([
             SchoolClass::query()->create([

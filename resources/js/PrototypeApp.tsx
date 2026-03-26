@@ -9,9 +9,18 @@ import MaterialsPage from '@/Pages/Materials/Index';
 import ActivitiesPage from '@/Pages/Activities/Index';
 import AgendaPage from '@/Pages/Agenda/Index';
 import { currentUser, navigation } from '@/data/mockData';
+import { EducaProProvider } from '@/hooks/useEducaPro';
 import { AppTab } from '@/types';
 
 export default function PrototypeApp() {
+    return (
+        <EducaProProvider>
+            <PrototypeShell />
+        </EducaProProvider>
+    );
+}
+
+function PrototypeShell() {
     const [activeTab, setActiveTab] = useState<AppTab>('dashboard');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 

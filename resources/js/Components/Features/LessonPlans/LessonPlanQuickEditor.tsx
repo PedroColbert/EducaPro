@@ -1,20 +1,46 @@
-import { Edit2 } from 'lucide-react';
+import { BookOpen, Calendar, Copy, Save } from 'lucide-react';
 
 import Card from '@/Components/UI/Card';
 
-export default function LessonPlanQuickEditor() {
+export default function LessonPlanQuickEditor({
+    children,
+    title,
+    subtitle,
+    onDuplicate,
+    onSave,
+}: {
+    children: React.ReactNode;
+    title: string;
+    subtitle: string;
+    onDuplicate: () => void;
+    onSave: () => void;
+}) {
     return (
-        <Card className="h-full border-2 border-dashed bg-slate-50/50">
-            <div className="flex h-full flex-col items-center justify-center py-10 text-center text-slate-500">
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-slate-100 bg-white shadow-sm">
-                    <Edit2 size={24} className="text-indigo-400" />
+        <Card className="h-full">
+            <div className="mb-5 flex items-start justify-between gap-3">
+                <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-indigo-500">Editor rapido</p>
+                    <h3 className="mt-2 text-xl font-bold text-slate-800">{title}</h3>
+                    <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
                 </div>
-                <h3 className="mb-2 font-bold text-slate-700">Editor Rápido</h3>
-                <p className="mb-6 px-4 text-sm">Selecione um plano de aula para editar seus detalhes, anexar materiais e registrar o homework.</p>
-                <button className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-indigo-600 transition-colors hover:border-indigo-300">
-                    Criar plano em branco
-                </button>
+                <div className="flex gap-2">
+                    <button onClick={onDuplicate} className="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50">
+                        <Copy size={16} />
+                    </button>
+                    <button onClick={onSave} className="rounded-xl bg-indigo-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-indigo-700">
+                        <Save size={16} />
+                    </button>
+                </div>
             </div>
+            <div className="mb-4 grid grid-cols-2 gap-3 text-xs text-slate-500">
+                <div className="flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2">
+                    <Calendar size={14} /> Planejamento funcional
+                </div>
+                <div className="flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2">
+                    <BookOpen size={14} /> Materiais e homework
+                </div>
+            </div>
+            {children}
         </Card>
     );
 }

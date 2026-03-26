@@ -2,14 +2,19 @@ import { ChevronRight } from 'lucide-react';
 
 import Badge from '@/Components/UI/Badge';
 import Card from '@/Components/UI/Card';
+import { studentStatusMeta } from '@/data/mockData';
 import { Student } from '@/types';
 
 export default function StudentTable({
     students,
     onSelectStudent,
+    onEditStudent,
+    getClassLabel,
 }: {
     students: Student[];
     onSelectStudent: (student: Student) => void;
+    onEditStudent: (student: Student) => void;
+    getClassLabel: (student: Student) => string;
 }) {
     return (
         <Card className="overflow-hidden p-0">
@@ -19,10 +24,10 @@ export default function StudentTable({
                         <tr className="border-b border-slate-100 bg-slate-50/50">
                             <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Aluno</th>
                             <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Turma</th>
-                            <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Nível</th>
-                            <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Frequência</th>
+                            <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Nivel</th>
+                            <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Frequencia</th>
                             <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Status</th>
-                            <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Ação</th>
+                            <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Acao</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
@@ -39,20 +44,29 @@ export default function StudentTable({
                                         </div>
                                     </div>
                                 </td>
-                                <td className="px-6 py-4 text-sm text-slate-600">{student.class}</td>
+                                <td className="px-6 py-4 text-sm text-slate-600">{getClassLabel(student)}</td>
                                 <td className="px-6 py-4">
                                     <Badge>{student.level}</Badge>
                                 </td>
-                                <td className="px-6 py-4 text-sm font-medium text-slate-700">{student.attendance}</td>
+                                <td className="px-6 py-4 text-sm font-medium text-slate-700">{student.attendanceRate}%</td>
                                 <td className="px-6 py-4">
-                                    <Badge variant={student.status === 'Excelente' || student.status === 'Ótimo' ? 'success' : student.status === 'Atenção' ? 'danger' : 'warning'}>
-                                        {student.status}
-                                    </Badge>
+                                    <Badge variant={studentStatusMeta[student.status].badge}>{studentStatusMeta[student.status].label}</Badge>
                                 </td>
                                 <td className="px-6 py-4 text-right">
-                                    <button className="flex w-full items-center justify-end gap-1 text-sm font-medium text-indigo-600 opacity-0 transition-opacity group-hover:opacity-100">
-                                        Ver perfil <ChevronRight size={14} />
-                                    </button>
+                                    <div className="flex items-center justify-end gap-3">
+                                        <button
+                                            className="text-sm font-medium text-slate-500 transition hover:text-slate-700"
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                onEditStudent(student);
+                                            }}
+                                        >
+                                            Editar
+                                        </button>
+                                        <button className="flex items-center justify-end gap-1 text-sm font-medium text-indigo-600 opacity-0 transition-opacity group-hover:opacity-100">
+                                            Ver perfil <ChevronRight size={14} />
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
