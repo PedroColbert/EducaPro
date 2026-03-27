@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Guardian;
+use App\Models\Student;
 use App\Models\User;
 
 return [
@@ -42,6 +44,14 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'guardian' => [
+            'driver' => 'session',
+            'provider' => 'guardians',
+        ],
+        'student' => [
+            'driver' => 'session',
+            'provider' => 'students',
+        ],
     ],
 
     /*
@@ -65,6 +75,14 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', User::class),
+        ],
+        'guardians' => [
+            'driver' => 'eloquent',
+            'model' => Guardian::class,
+        ],
+        'students' => [
+            'driver' => 'eloquent',
+            'model' => Student::class,
         ],
 
         // 'users' => [
@@ -95,6 +113,18 @@ return [
     'passwords' => [
         'users' => [
             'provider' => 'users',
+            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'guardians' => [
+            'provider' => 'guardians',
+            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'students' => [
+            'provider' => 'students',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
             'expire' => 60,
             'throttle' => 60,

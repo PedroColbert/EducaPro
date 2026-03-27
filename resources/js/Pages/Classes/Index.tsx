@@ -4,12 +4,17 @@ import { ArrowLeft, Plus } from 'lucide-react';
 import ClassCard from '@/Components/Features/Classes/ClassCard';
 import { EmptyState } from '@/Components/UI/EmptyState';
 import { ModalShell } from '@/Components/UI/ModalShell';
+import { audienceTypeOptions, deliveryModeOptions } from '@/data/mockData';
+import { useAppContext } from '@/hooks/useAppContext';
 import { useEducaPro } from '@/hooks/useEducaPro';
 import { AttendanceEntry, CourseClass, CourseClassDraft } from '@/types';
 
 const emptyClassDraft: CourseClassDraft = {
     name: '',
     level: 'A2',
+    subjectId: null,
+    deliveryMode: 'in_person',
+    audienceType: 'group',
     schedule: '',
     progress: 0,
     nextTopic: '',
@@ -19,7 +24,8 @@ const emptyClassDraft: CourseClassDraft = {
 };
 
 export default function ClassesPage() {
-    const { classes, students, getStudentsForClass, getActivitiesForClass, getAttendanceForClass, saveClass, saveAttendanceSession } = useEducaPro();
+    const { appContext } = useAppContext();
+    const { classes, students, subjects, getStudentsForClass, getActivitiesForClass, getAttendanceForClass, saveClass, saveAttendanceSession } = useEducaPro();
     const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isAttendanceOpen, setIsAttendanceOpen] = useState(false);
@@ -42,6 +48,9 @@ export default function ClassesPage() {
         setDraft({
             name: courseClass.name,
             level: courseClass.level,
+            subjectId: courseClass.subjectId,
+            deliveryMode: courseClass.deliveryMode,
+            audienceType: courseClass.audienceType,
             schedule: courseClass.schedule,
             progress: courseClass.progress,
             nextTopic: courseClass.nextTopic,
@@ -88,6 +97,7 @@ export default function ClassesPage() {
         const classStudents = getStudentsForClass(selectedClass.id);
         const classActivities = getActivitiesForClass(selectedClass.id);
         const classAttendance = getAttendanceForClass(selectedClass.id);
+        const subject = subjects.find((item) => item.id === selectedClass.subjectId);
 
         return (
             <>
@@ -104,7 +114,7 @@ export default function ClassesPage() {
                                     <h1 className="text-3xl font-bold text-slate-800">{selectedClass.name}</h1>
                                 </div>
                                 <p className="text-sm text-slate-500">
-                                    {selectedClass.level} • {selectedClass.schedule} • {selectedClass.room}
+                                    {subject?.name ?? 'Sem disciplina'} / {selectedClass.level} / {selectedClass.schedule} / {selectedClass.room}
                                 </p>
                                 <p className="mt-3 text-sm text-slate-600">Proximo topico: {selectedClass.nextTopic}</p>
                             </div>
@@ -122,8 +132,8 @@ export default function ClassesPage() {
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                         <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm lg:col-span-2">
                             <div className="mb-4 flex items-center justify-between">
-                                <h2 className="text-lg font-bold text-slate-800">Alunos da turma</h2>
-                                <span className="text-sm text-slate-500">{classStudents.length} alunos vinculados</span>
+                                <h2 className="text-lg font-bold text-slate-800">Participantes vinculados</h2>
+                                <span className="text-sm text-slate-500">{classStudents.length} estudantes</span>
                             </div>
                             <div className="space-y-3">
                                 {classStudents.map((student) => (
@@ -131,7 +141,7 @@ export default function ClassesPage() {
                                         <div>
                                             <p className="font-medium text-slate-800">{student.name}</p>
                                             <p className="text-sm text-slate-500">
-                                                {student.level} • {student.attendanceRate}% de frequencia
+                                                {student.level} / {student.attendanceRate}% de frequencia
                                             </p>
                                         </div>
                                         <span className={`rounded-full px-3 py-1 text-xs font-medium ${student.color}`}>{student.status}</span>
@@ -144,7 +154,9 @@ export default function ClassesPage() {
                             <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
                                 <h2 className="text-lg font-bold text-slate-800">Panorama rapido</h2>
                                 <div className="mt-4 space-y-3 text-sm text-slate-600">
-                                    <p>Progresso do semestre: {selectedClass.progress}%</p>
+                                    <p>Progresso do periodo: {selectedClass.progress}%</p>
+                                    <p>Modalidade: {deliveryModeOptions.find((item) => item.value === selectedClass.deliveryMode)?.label}</p>
+                                    <p>Formato: {audienceTypeOptions.find((item) => item.value === selectedClass.audienceType)?.label}</p>
                                     <p>Atividades abertas: {classActivities.length}</p>
                                     <p>Chamadas registradas: {classAttendance.length}</p>
                                 </div>
@@ -155,7 +167,7 @@ export default function ClassesPage() {
                                     {classAttendance.length ? (
                                         classAttendance.slice(-3).map((session) => (
                                             <div key={session.id} className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                                                {new Date(session.date).toLocaleDateString('pt-BR')} • {session.entries.length} registros
+                                                {new Date(session.date).toLocaleDateString('pt-BR')} / {session.entries.length} registros
                                             </div>
                                         ))
                                     ) : (
@@ -171,6 +183,7 @@ export default function ClassesPage() {
                     open={isFormOpen}
                     draft={draft}
                     students={students}
+                    subjects={subjects}
                     editingClassId={editingClassId}
                     isSaving={isSaving}
                     onClose={() => setIsFormOpen(false)}
@@ -199,8 +212,8 @@ export default function ClassesPage() {
             <div className="animate-in space-y-6 fade-in duration-500">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-800">Turmas</h1>
-                        <p className="mt-1 text-slate-500">Gerencie turmas, alocacao de alunos e registro de chamada.</p>
+                        <h1 className="text-2xl font-bold text-slate-800">{appContext.labels.classes}</h1>
+                        <p className="mt-1 text-slate-500">Gerencie grupos, atendimentos, alocacao de estudantes e registro de presenca.</p>
                     </div>
                     <button onClick={openCreateForm} className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50">
                         <Plus size={16} /> Nova turma
@@ -213,6 +226,7 @@ export default function ClassesPage() {
                             <ClassCard
                                 key={courseClass.id}
                                 courseClass={courseClass}
+                                subjectLabel={subjects.find((subject) => subject.id === courseClass.subjectId)?.name ?? 'Sem disciplina'}
                                 studentCount={getStudentsForClass(courseClass.id).length}
                                 onEdit={() => openEditForm(courseClass)}
                                 onOpenDetails={() => setSelectedClassId(courseClass.id)}
@@ -222,11 +236,11 @@ export default function ClassesPage() {
                     </div>
                 ) : (
                     <EmptyState
-                        title="Nenhuma turma cadastrada"
-                        description="Crie a primeira turma para vincular alunos, registrar presenca e acompanhar o semestre."
+                        title="Nenhum grupo cadastrado"
+                        description="Crie o primeiro grupo, turma ou atendimento para vincular estudantes, registrar presenca e acompanhar o periodo."
                         action={
                             <button onClick={openCreateForm} className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700">
-                                Criar turma
+                                Criar grupo
                             </button>
                         }
                     />
@@ -237,6 +251,7 @@ export default function ClassesPage() {
                 open={isFormOpen}
                 draft={draft}
                 students={students}
+                subjects={subjects}
                 editingClassId={editingClassId}
                 isSaving={isSaving}
                 onClose={() => setIsFormOpen(false)}
@@ -245,13 +260,13 @@ export default function ClassesPage() {
             />
 
             {selectedClass ? (
-                    <AttendanceModal
-                        open={isAttendanceOpen}
-                        courseClass={selectedClass}
-                        students={selectedClassId ? getStudentsForClass(selectedClassId) : []}
-                        attendanceDate={attendanceDate}
-                        attendanceEntries={attendanceEntries}
-                        isSaving={isSaving}
+                <AttendanceModal
+                    open={isAttendanceOpen}
+                    courseClass={selectedClass}
+                    students={selectedClassId ? getStudentsForClass(selectedClassId) : []}
+                    attendanceDate={attendanceDate}
+                    attendanceEntries={attendanceEntries}
+                    isSaving={isSaving}
                     onClose={() => setIsAttendanceOpen(false)}
                     onDateChange={setAttendanceDate}
                     onChangeEntries={setAttendanceEntries}
@@ -266,6 +281,7 @@ function ClassFormModal({
     open,
     draft,
     students,
+    subjects,
     editingClassId,
     isSaving,
     onClose,
@@ -275,6 +291,7 @@ function ClassFormModal({
     open: boolean;
     draft: CourseClassDraft;
     students: ReturnType<typeof useEducaPro>['students'];
+    subjects: ReturnType<typeof useEducaPro>['subjects'];
     editingClassId: number | null;
     isSaving: boolean;
     onClose: () => void;
@@ -284,8 +301,8 @@ function ClassFormModal({
     return (
         <ModalShell
             open={open}
-            title={editingClassId ? 'Editar turma' : 'Nova turma'}
-            description="Defina nome, horario, progresso e alunos vinculados."
+            title={editingClassId ? 'Editar grupo' : 'Novo grupo'}
+            description="Defina disciplina, modalidade, formato, progresso e participantes vinculados."
             onClose={onClose}
             footer={
                 <div className="flex justify-end gap-3">
@@ -293,7 +310,7 @@ function ClassFormModal({
                         Cancelar
                     </button>
                     <button onClick={onSubmit} disabled={!draft.name || isSaving} className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-400">
-                        {isSaving ? 'Salvando...' : editingClassId ? 'Salvar turma' : 'Criar turma'}
+                        {isSaving ? 'Salvando...' : editingClassId ? 'Salvar grupo' : 'Criar grupo'}
                     </button>
                 </div>
             }
@@ -308,11 +325,42 @@ function ClassFormModal({
                     <input value={draft.level} onChange={(event) => onChange({ ...draft, level: event.target.value })} className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
                 </label>
                 <label className="space-y-2">
+                    <span className="text-sm font-medium text-slate-700">Disciplina</span>
+                    <select value={draft.subjectId ?? ''} onChange={(event) => onChange({ ...draft, subjectId: event.target.value ? Number(event.target.value) : null })} className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                        <option value="">Selecione</option>
+                        {subjects.map((subject) => (
+                            <option key={subject.id} value={subject.id}>
+                                {subject.name}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+                <label className="space-y-2">
+                    <span className="text-sm font-medium text-slate-700">Modalidade</span>
+                    <select value={draft.deliveryMode} onChange={(event) => onChange({ ...draft, deliveryMode: event.target.value as CourseClassDraft['deliveryMode'] })} className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                        {deliveryModeOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+                <label className="space-y-2">
+                    <span className="text-sm font-medium text-slate-700">Formato</span>
+                    <select value={draft.audienceType} onChange={(event) => onChange({ ...draft, audienceType: event.target.value as CourseClassDraft['audienceType'] })} className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                        {audienceTypeOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+                <label className="space-y-2">
                     <span className="text-sm font-medium text-slate-700">Horario</span>
                     <input value={draft.schedule} onChange={(event) => onChange({ ...draft, schedule: event.target.value })} className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
                 </label>
                 <label className="space-y-2">
-                    <span className="text-sm font-medium text-slate-700">Sala</span>
+                    <span className="text-sm font-medium text-slate-700">Sala ou ambiente</span>
                     <input value={draft.room} onChange={(event) => onChange({ ...draft, room: event.target.value })} className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
                 </label>
                 <label className="space-y-2">
@@ -325,7 +373,7 @@ function ClassFormModal({
                     <input value={draft.nextTopic} onChange={(event) => onChange({ ...draft, nextTopic: event.target.value })} className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
                 </label>
                 <div className="space-y-3 md:col-span-2">
-                    <span className="text-sm font-medium text-slate-700">Alunos vinculados</span>
+                    <span className="text-sm font-medium text-slate-700">Estudantes vinculados</span>
                     <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                         {students.map((student) => (
                             <label key={student.id} className="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-600">
@@ -380,7 +428,7 @@ function AttendanceModal({
         <ModalShell
             open={open}
             title={`Chamada - ${courseClass.name}`}
-            description="Registre presenca, atrasos e justificativas da turma."
+            description="Registre presenca, atrasos e justificativas do grupo."
             onClose={onClose}
             footer={
                 <div className="flex justify-end gap-3">

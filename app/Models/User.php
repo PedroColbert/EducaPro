@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -20,11 +22,16 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'organization_id',
+        'organization_unit_id',
         'name',
+        'display_name',
         'email',
         'timezone',
         'locale',
         'teaching_focus',
+        'role',
+        'settings',
         'password',
     ];
 
@@ -48,7 +55,18 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'settings' => 'array',
         ];
+    }
+
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class);
+    }
+
+    public function organizationUnit(): BelongsTo
+    {
+        return $this->belongsTo(OrganizationUnit::class);
     }
 
     public function students(): HasMany
@@ -59,6 +77,13 @@ class User extends Authenticatable
     public function schoolClasses(): HasMany
     {
         return $this->hasMany(SchoolClass::class);
+    }
+
+    public function assignedSchoolClasses(): BelongsToMany
+    {
+        return $this->belongsToMany(SchoolClass::class)
+            ->withPivot(['assignment_role', 'is_primary'])
+            ->withTimestamps();
     }
 
     public function lessonPlans(): HasMany
@@ -89,5 +114,10 @@ class User extends Authenticatable
     public function agendaItems(): HasMany
     {
         return $this->hasMany(AgendaItem::class);
+    }
+
+    public function academicSubjects(): HasMany
+    {
+        return $this->hasMany(AcademicSubject::class);
     }
 }

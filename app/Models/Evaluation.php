@@ -11,6 +11,7 @@ class Evaluation extends Model
     use HasFactory;
 
     protected $fillable = [
+        'organization_id',
         'student_id',
         'school_class_id',
         'title',
@@ -31,6 +32,11 @@ class Evaluation extends Model
     public function student(): BelongsTo
     {
         return $this->belongsTo(Student::class);
+    }
+
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class);
     }
 
     public function schoolClass(): BelongsTo

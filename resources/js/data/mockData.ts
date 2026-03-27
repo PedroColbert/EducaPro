@@ -19,24 +19,48 @@ import {
     LessonPlan,
     Material,
     NavigationItem,
+    Subject,
     Student,
 } from '@/types';
 
 export const currentUser: CurrentUser = {
-    name: 'Marina Silva',
-    role: 'Professora de Ingles',
-    avatar: 'MS',
+    name: 'Alex Educador',
+    role: 'Docente responsavel',
+    avatar: 'AE',
+    organizationName: 'EducaPro Demo Workspace',
 };
 
 export const navigation: NavigationItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'alunos', label: 'Alunos', icon: Users },
-    { id: 'turmas', label: 'Turmas', icon: BookOpen },
-    { id: 'planejamento', label: 'Plano de Aulas', icon: Calendar },
-    { id: 'materiais', label: 'Materiais', icon: Folder },
+    { id: 'alunos', label: 'Estudantes', icon: Users },
+    { id: 'turmas', label: 'Turmas e grupos', icon: BookOpen },
+    { id: 'planejamento', label: 'Planejamento', icon: Calendar },
+    { id: 'materiais', label: 'Recursos', icon: Folder },
     { id: 'atividades', label: 'Atividades', icon: FileText },
     { id: 'agenda', label: 'Agenda', icon: CheckSquare },
+    { id: 'desempenho', label: 'Relatorios', icon: AlertCircle },
 ];
+
+export const navigationByRole = {
+    admin: [
+        { id: 'dashboard', label: 'Painel executivo', icon: LayoutDashboard },
+        { id: 'alunos', label: 'Estudantes', icon: Users },
+        { id: 'turmas', label: 'Turmas e grupos', icon: BookOpen },
+        { id: 'atividades', label: 'Atividades', icon: FileText },
+        { id: 'agenda', label: 'Agenda institucional', icon: CheckSquare },
+        { id: 'desempenho', label: 'Relatorios', icon: AlertCircle },
+    ],
+    coordinator: [
+        { id: 'dashboard', label: 'Painel da coordenacao', icon: LayoutDashboard },
+        { id: 'alunos', label: 'Estudantes', icon: Users },
+        { id: 'turmas', label: 'Turmas e grupos', icon: BookOpen },
+        { id: 'planejamento', label: 'Planejamento', icon: Calendar },
+        { id: 'atividades', label: 'Atividades', icon: FileText },
+        { id: 'agenda', label: 'Agenda', icon: CheckSquare },
+        { id: 'desempenho', label: 'Relatorios', icon: AlertCircle },
+    ],
+    teacher: navigation,
+} as const;
 
 export const studentStatusMeta = {
     great: { label: 'Otimo', badge: 'success', color: 'bg-indigo-100 text-indigo-700' },
@@ -65,8 +89,23 @@ export const attendanceStatusMeta = {
     justified: { label: 'Justificado' },
 } as const;
 
-export const levelOptions = ['A1', 'A2', 'B1', 'B2', 'Kids 3', 'Conversation'];
+export const levelOptions = ['A1', 'A2', 'B1', 'B2', 'Fundamental', 'Ensino Medio', 'Adultos'];
 export const materialCategoryOptions = ['Grammar', 'Vocabulary', 'Listening', 'Speaking', 'Reading', 'Writing'];
+export const deliveryModeOptions = [
+    { value: 'in_person', label: 'Presencial' },
+    { value: 'online', label: 'Online' },
+    { value: 'hybrid', label: 'Hibrido' },
+] as const;
+export const audienceTypeOptions = [
+    { value: 'group', label: 'Turma ou grupo' },
+    { value: 'individual', label: 'Individual' },
+] as const;
+
+const subjects: Subject[] = [
+    { id: 1, name: 'Ingles', code: 'EN' },
+    { id: 2, name: 'Comunicacao', code: 'COM' },
+    { id: 3, name: 'Reforco academico', code: 'SUP' },
+];
 
 const students: Student[] = [
     { id: 1, name: 'Lucas Fernandes', age: 14, level: 'B1', status: 'great', initials: 'LF', color: studentStatusMeta.great.color, email: 'lucas.f@email.com', phone: '(11) 99888-1101', notes: 'Muito participativo, mas precisa de mais apoio em writing.', attendanceRate: 95, classIds: [1] },
@@ -76,9 +115,9 @@ const students: Student[] = [
 ];
 
 const classes: CourseClass[] = [
-    { id: 1, name: 'Turma B1 - Avancado', level: 'B1', schedule: 'Seg e Qua, 10:00', progress: 75, nextTopic: 'Conditionals (2nd & 3rd)', room: 'Sala 02', color: '#4f46e5', studentIds: [1, 2] },
-    { id: 2, name: 'Turma A2 - Intermediario', level: 'A2', schedule: 'Ter e Qui, 08:00', progress: 45, nextTopic: 'Past Continuous', room: 'Sala 04', color: '#7c3aed', studentIds: [4] },
-    { id: 3, name: 'Turma Kids 3', level: 'Kids 3', schedule: 'Seg e Qua, 13:30', progress: 60, nextTopic: 'Animals & Habitats', room: 'Sala 07', color: '#059669', studentIds: [3] },
+    { id: 1, name: 'Grupo B1 avancado', level: 'B1', subjectId: 1, deliveryMode: 'in_person', audienceType: 'group', schedule: 'Seg e Qua, 10:00', progress: 75, nextTopic: 'Conditionals (2nd & 3rd)', room: 'Sala 02', color: '#4f46e5', studentIds: [1, 2] },
+    { id: 2, name: 'Turma A2 intermediaria', level: 'A2', subjectId: 1, deliveryMode: 'hybrid', audienceType: 'group', schedule: 'Ter e Qui, 08:00', progress: 45, nextTopic: 'Past Continuous', room: 'Sala 04', color: '#7c3aed', studentIds: [4] },
+    { id: 3, name: 'Atendimento guiado', level: 'Fundamental', subjectId: 3, deliveryMode: 'online', audienceType: 'individual', schedule: 'Seg e Qua, 13:30', progress: 60, nextTopic: 'Rotina de estudos', room: 'Sala virtual', color: '#059669', studentIds: [3] },
 ];
 
 const materials: Material[] = [
@@ -115,6 +154,7 @@ const attendanceSessions: AttendanceSession[] = [
 
 export function createInitialEducaProState(): EducaProState {
     return {
+        subjects,
         students,
         classes,
         materials,

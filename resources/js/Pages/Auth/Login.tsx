@@ -196,6 +196,18 @@ export default function Login({ canResetPassword, forgotPasswordUrl, requestAcce
                         </button>
                     )}
                 </p>
+                <p className="mt-3 text-sm text-slate-500">
+                    Acesso para pais ou responsaveis?{' '}
+                    <Link href="/family/login" className="font-semibold text-indigo-600 transition-colors hover:text-indigo-700">
+                        Entrar no portal da familia
+                    </Link>
+                </p>
+                <p className="mt-2 text-sm text-slate-500">
+                    Acesso para estudantes?{' '}
+                    <Link href="/student/login" className="font-semibold text-indigo-600 transition-colors hover:text-indigo-700">
+                        Entrar no portal do estudante
+                    </Link>
+                </p>
             </div>
         </AuthLayout>
     );

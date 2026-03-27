@@ -32,11 +32,13 @@ export default function AgendaPage() {
     const [draft, setDraft] = useState<AgendaItemDraft>(emptyAgendaDraft);
     const [editingItemId, setEditingItemId] = useState<number | null>(null);
     const [isSaving, setIsSaving] = useState(false);
+    const [weekStart, setWeekStart] = useState(() => getInitialWeekStart(agendaItems));
 
     const agendaByDay = useMemo(() => {
-        return weekDays.map((weekDay) => {
+        return weekDays.map((weekDay, index) => {
+            const date = addDays(weekStart, index);
             const slots = agendaItems
-                .filter((item) => new Date(item.startsAt).toLocaleDateString('pt-BR', { weekday: 'long' }).toLowerCase() === weekDay)
+                .filter((item) => isSameDay(new Date(item.startsAt), date))
                 .sort((left, right) => left.startsAt.localeCompare(right.startsAt))
                 .map((item) => ({
                     item,
@@ -45,11 +47,12 @@ export default function AgendaPage() {
 
             return {
                 day: weekDay.replace('-feira', '').replace('terca', 'Terca').replace('segunda', 'Segunda').replace('quarta', 'Quarta').replace('quinta', 'Quinta').replace('sexta', 'Sexta'),
-                date: slots[0] ? new Date(slots[0].item.startsAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }) : '--',
+                date: date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
+                isoDate: toIsoDate(date),
                 slots,
             };
         });
-    }, [agendaItems]);
+    }, [agendaItems, weekStart]);
 
     const openCreate = (isoDay?: string) => {
         setEditingItemId(null);
@@ -98,11 +101,21 @@ export default function AgendaPage() {
                         <p className="mt-1 text-slate-500">Adicione aulas, lembretes, reunioes e blocos de correcao com uma agenda visual.</p>
                     </div>
                     <div className="flex gap-2">
-                        <button className="rounded-lg border border-slate-200 p-2 text-slate-600 hover:bg-slate-50">
+                        <button
+                            type="button"
+                            onClick={() => setWeekStart((current) => addDays(current, -7))}
+                            className="rounded-lg border border-slate-200 p-2 text-slate-600 hover:bg-slate-50"
+                        >
                             <ArrowLeft size={18} />
                         </button>
-                        <span className="rounded-lg border border-slate-200 bg-white px-4 py-2 font-medium text-slate-700">Outubro 2026</span>
-                        <button className="rounded-lg border border-slate-200 p-2 text-slate-600 hover:bg-slate-50">
+                        <span className="rounded-lg border border-slate-200 bg-white px-4 py-2 font-medium text-slate-700">
+                            {weekLabel(weekStart)}
+                        </span>
+                        <button
+                            type="button"
+                            onClick={() => setWeekStart((current) => addDays(current, 7))}
+                            className="rounded-lg border border-slate-200 p-2 text-slate-600 hover:bg-slate-50"
+                        >
                             <ChevronRight size={18} />
                         </button>
                         <button onClick={() => openCreate()} className="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700">
@@ -118,7 +131,7 @@ export default function AgendaPage() {
                             day={day.day}
                             date={day.date}
                             slots={day.slots}
-                            onAdd={() => openCreate(`2026-10-${String(12 + index).padStart(2, '0')}`)}
+                            onAdd={() => openCreate(day.isoDate)}
                             onSelect={openEdit}
                         />
                     ))}
@@ -203,4 +216,45 @@ export default function AgendaPage() {
             </ModalShell>
         </>
     );
+}
+
+function getInitialWeekStart(items: AgendaItem[]) {
+    const seedDate = items.length ? new Date(items[0].startsAt) : new Date();
+    return startOfWeek(seedDate);
+}
+
+function startOfWeek(date: Date) {
+    const normalized = new Date(date);
+    normalized.setHours(0, 0, 0, 0);
+    const day = normalized.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    normalized.setDate(normalized.getDate() + diff);
+    return normalized;
+}
+
+function addDays(date: Date, days: number) {
+    const next = new Date(date);
+    next.setDate(next.getDate() + days);
+    return next;
+}
+
+function isSameDay(left: Date, right: Date) {
+    return (
+        left.getFullYear() === right.getFullYear() &&
+        left.getMonth() === right.getMonth() &&
+        left.getDate() === right.getDate()
+    );
+}
+
+function toIsoDate(date: Date) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+function weekLabel(weekStart: Date) {
+    const weekEnd = addDays(weekStart, 4);
+
+    return `${weekStart.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })} a ${weekEnd.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: 'short',
+    })}`;
 }

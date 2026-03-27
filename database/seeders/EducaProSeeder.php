@@ -2,14 +2,15 @@
 
 namespace Database\Seeders;
 
+use App\Models\AcademicSubject;
 use App\Models\AgendaItem;
 use App\Models\Assignment;
-use App\Models\AssignmentSubmission;
-use App\Models\Attendance;
 use App\Models\Evaluation;
+use App\Models\Guardian;
 use App\Models\LessonPlan;
 use App\Models\LessonRecord;
 use App\Models\Material;
+use App\Models\OrganizationUnit;
 use App\Models\PedagogicalNote;
 use App\Models\SchoolClass;
 use App\Models\Student;
@@ -21,30 +22,90 @@ class EducaProSeeder extends Seeder
     public function run(): void
     {
         $user = User::query()
-            ->where('email', 'admin@educapro.com')
+            ->where('email', 'professor@educapro.com')
             ->firstOrFail();
+
+        $coordinator = User::query()->where('email', 'coordenacao@educapro.com')->first();
+        $unit = OrganizationUnit::query()
+            ->where('organization_id', $user->organization_id)
+            ->first();
+
+        $organizationId = $user->organization_id;
+        $studentIds = Student::query()->where('user_id', $user->id)->pluck('id');
+
+        AgendaItem::query()->where('user_id', $user->id)->delete();
+        PedagogicalNote::query()->where('user_id', $user->id)->delete();
+        Evaluation::query()->whereIn('student_id', $studentIds)->delete();
+        Assignment::query()->where('user_id', $user->id)->delete();
+        LessonRecord::query()->where('user_id', $user->id)->delete();
+        LessonPlan::query()->where('user_id', $user->id)->delete();
+        Material::query()->where('user_id', $user->id)->delete();
+        SchoolClass::query()->where('user_id', $user->id)->get()->each(fn (SchoolClass $schoolClass) => $schoolClass->students()->detach());
+        Student::query()->where('user_id', $user->id)->delete();
+        SchoolClass::query()->where('user_id', $user->id)->delete();
+        AcademicSubject::query()->where('user_id', $user->id)->delete();
+        Guardian::query()->where('organization_id', $organizationId)->delete();
+
+        $subjects = collect([
+            AcademicSubject::query()->create([
+                'organization_id' => $organizationId,
+                'user_id' => $user->id,
+                'name' => 'Ingles',
+                'code' => 'EN',
+                'description' => 'Componente de idiomas para turmas de diferentes niveis.',
+            ]),
+            AcademicSubject::query()->create([
+                'organization_id' => $organizationId,
+                'user_id' => $user->id,
+                'name' => 'Comunicacao',
+                'code' => 'COM',
+                'description' => 'Espaco para conversacao, debate e producao oral.',
+            ]),
+            AcademicSubject::query()->create([
+                'organization_id' => $organizationId,
+                'user_id' => $user->id,
+                'name' => 'Reforco academico',
+                'code' => 'SUP',
+                'description' => 'Aulas de apoio individual ou pequenos grupos.',
+            ]),
+        ]);
 
         $classes = collect([
             SchoolClass::query()->create([
                 'user_id' => $user->id,
+                'organization_id' => $organizationId,
+                'organization_unit_id' => $unit?->id,
+                'academic_subject_id' => $subjects[0]->id,
                 'name' => 'Teens B1 Tuesday',
                 'level' => 'B1',
+                'delivery_mode' => 'in_person',
+                'audience_type' => 'group',
                 'schedule_description' => 'Terca e quinta, 19h as 20h',
                 'color' => '#0f766e',
                 'progress' => 64,
             ]),
             SchoolClass::query()->create([
                 'user_id' => $user->id,
+                'organization_id' => $organizationId,
+                'organization_unit_id' => $unit?->id,
+                'academic_subject_id' => $subjects[1]->id,
                 'name' => 'Adults Conversation',
                 'level' => 'B2',
+                'delivery_mode' => 'online',
+                'audience_type' => 'group',
                 'schedule_description' => 'Segunda e quarta, 20h30 as 21h30',
                 'color' => '#ea580c',
                 'progress' => 48,
             ]),
             SchoolClass::query()->create([
                 'user_id' => $user->id,
+                'organization_id' => $organizationId,
+                'organization_unit_id' => $unit?->id,
+                'academic_subject_id' => $subjects[2]->id,
                 'name' => 'Private Starter',
                 'level' => 'A2',
+                'delivery_mode' => 'hybrid',
+                'audience_type' => 'individual',
                 'schedule_description' => 'Sexta, 18h',
                 'color' => '#7c3aed',
                 'progress' => 81,
@@ -52,15 +113,18 @@ class EducaProSeeder extends Seeder
         ]);
 
         $students = collect([
-            ['name' => 'Livia Costa', 'age' => 14, 'level' => 'B1', 'status' => 'excellent', 'email_contact' => 'livia@example.com'],
+            ['name' => 'Livia Costa', 'age' => 14, 'level' => 'B1', 'status' => 'excellent', 'email_contact' => 'aluno@educapro.com'],
             ['name' => 'Rafael Nunes', 'age' => 15, 'level' => 'B1', 'status' => 'good', 'email_contact' => 'rafael@example.com'],
             ['name' => 'Camila Siqueira', 'age' => 28, 'level' => 'B2', 'status' => 'good', 'email_contact' => 'camila@example.com'],
             ['name' => 'Bruno Azevedo', 'age' => 33, 'level' => 'B2', 'status' => 'attention', 'email_contact' => 'bruno@example.com'],
             ['name' => 'Helena Rocha', 'age' => 11, 'level' => 'A2', 'status' => 'excellent', 'email_contact' => 'helena@example.com'],
         ])->map(fn (array $student) => Student::query()->create([
             'user_id' => $user->id,
+            'organization_id' => $organizationId,
+            'organization_unit_id' => $unit?->id,
             'phone_contact' => '(11) 99999-0000',
-            'notes' => 'Aluno acompanhado individualmente pela professora.',
+            'notes' => 'Participante acompanhado conforme objetivos academicos do contexto atual.',
+            'password' => $student['email_contact'] === 'aluno@educapro.com' ? '12345678' : null,
             ...$student,
         ]));
 
@@ -68,27 +132,57 @@ class EducaProSeeder extends Seeder
         $classes[1]->students()->attach([$students[2]->id, $students[3]->id]);
         $classes[2]->students()->attach([$students[4]->id]);
 
+        $classes->each(function (SchoolClass $schoolClass) use ($user, $coordinator) {
+            $payload = [
+                $user->id => ['assignment_role' => 'teacher', 'is_primary' => true],
+            ];
+
+            if ($coordinator) {
+                $payload[$coordinator->id] = ['assignment_role' => 'coordinator', 'is_primary' => false];
+            }
+
+            $schoolClass->staff()->sync($payload);
+        });
+
+        $guardian = Guardian::query()->create([
+            'organization_id' => $organizationId,
+            'organization_unit_id' => $unit?->id,
+            'name' => 'Patricia Costa',
+            'email' => 'familia@educapro.com',
+            'phone' => '(11) 98888-2200',
+            'relationship_label' => 'Mae',
+            'password' => '12345678',
+        ]);
+
+        $guardian->students()->attach([
+            $students[0]->id => ['relationship_label' => 'Mae', 'is_primary' => true, 'receives_notifications' => true],
+            $students[4]->id => ['relationship_label' => 'Responsavel', 'is_primary' => false, 'receives_notifications' => true],
+        ]);
+
         $materials = collect([
             ['title' => 'B1 Conversation Prompts', 'type' => 'pdf', 'category' => 'Speaking', 'level' => 'B1', 'file_path_or_url' => 'materials/conversation-prompts.pdf', 'is_favorite' => true],
             ['title' => 'Present Perfect Video', 'type' => 'video', 'category' => 'Grammar', 'level' => 'B1', 'file_path_or_url' => 'https://example.com/present-perfect', 'is_favorite' => false],
             ['title' => 'Listening Warmup Playlist', 'type' => 'link', 'category' => 'Listening', 'level' => 'B2', 'file_path_or_url' => 'https://example.com/listening-playlist', 'is_favorite' => true],
         ])->map(fn (array $material) => Material::query()->create([
             'user_id' => $user->id,
+            'organization_id' => $organizationId,
             ...$material,
         ]));
 
         $plans = collect([
             LessonPlan::query()->create([
                 'user_id' => $user->id,
+                'organization_id' => $organizationId,
                 'school_class_id' => $classes[0]->id,
                 'planned_for' => now()->addDays(2)->toDateString(),
                 'topic' => 'Past experiences and travel stories',
-                'objectives' => ['Expandir vocabulário de viagens', 'Praticar present perfect'],
+                'objectives' => ['Expandir vocabulario de viagens', 'Praticar present perfect'],
                 'content' => ['Icebreaker', 'Listening', 'Controlled speaking', 'Homework briefing'],
                 'status' => 'planned',
             ]),
             LessonPlan::query()->create([
                 'user_id' => $user->id,
+                'organization_id' => $organizationId,
                 'school_class_id' => $classes[1]->id,
                 'planned_for' => now()->addDays(1)->toDateString(),
                 'topic' => 'Debate: remote work routines',
@@ -104,16 +198,18 @@ class EducaProSeeder extends Seeder
         $records = collect([
             LessonRecord::query()->create([
                 'user_id' => $user->id,
+                'organization_id' => $organizationId,
                 'school_class_id' => $classes[0]->id,
                 'lesson_plan_id' => $plans[0]->id,
                 'taught_on' => now()->subDays(2)->toDateString(),
                 'topic_taught' => 'Travel mishaps storytelling',
                 'participation_level' => 'high',
-                'difficulties_noted' => 'Alguns alunos ainda confundem present perfect com simple past.',
+                'difficulties_noted' => 'Alguns participantes ainda confundem present perfect com simple past.',
                 'general_notes' => 'A turma respondeu bem aos prompts em duplas.',
             ]),
             LessonRecord::query()->create([
                 'user_id' => $user->id,
+                'organization_id' => $organizationId,
                 'school_class_id' => $classes[1]->id,
                 'taught_on' => now()->subDay()->toDateString(),
                 'topic_taught' => 'Opinion phrases for meetings',
@@ -123,64 +219,69 @@ class EducaProSeeder extends Seeder
             ]),
         ]);
 
-        foreach ($classes[0]->students as $student) {
-            Attendance::query()->create([
-                'lesson_record_id' => $records[0]->id,
-                'student_id' => $student->id,
-                'status' => $student->id === $students[1]->id ? 'late' : 'present',
-                'observation' => $student->id === $students[1]->id ? 'Chegou 10 minutos atrasado.' : null,
-            ]);
-        }
+        $records[0]->attendances()->createMany([
+            ['student_id' => $students[0]->id, 'status' => 'present', 'observation' => null],
+            ['student_id' => $students[1]->id, 'status' => 'late', 'observation' => 'Chegou 10 minutos atrasado.'],
+        ]);
 
-        foreach ($classes[1]->students as $student) {
-            Attendance::query()->create([
-                'lesson_record_id' => $records[1]->id,
-                'student_id' => $student->id,
-                'status' => $student->id === $students[3]->id ? 'absent' : 'present',
-                'observation' => $student->id === $students[3]->id ? 'Faltou sem justificativa.' : null,
-            ]);
-        }
+        $records[1]->attendances()->createMany([
+            ['student_id' => $students[2]->id, 'status' => 'present', 'observation' => null],
+            ['student_id' => $students[3]->id, 'status' => 'absent', 'observation' => 'Faltou sem justificativa.'],
+        ]);
 
         $assignments = collect([
             Assignment::query()->create([
                 'user_id' => $user->id,
+                'organization_id' => $organizationId,
                 'school_class_id' => $classes[0]->id,
                 'title' => 'Travel diary paragraph',
-                'description' => 'Escrever um parágrafo usando present perfect e simple past.',
+                'description' => 'Escrever um paragrafo usando present perfect e simple past.',
                 'due_date' => now()->addDays(4),
-                'status' => 'assigned',
+                'status' => 'draft',
             ]),
             Assignment::query()->create([
                 'user_id' => $user->id,
+                'organization_id' => $organizationId,
                 'school_class_id' => $classes[1]->id,
                 'title' => 'Meeting phrases audio response',
-                'description' => 'Gravar uma resposta curta com opinião e justificativa.',
+                'description' => 'Gravar uma resposta curta com opiniao e justificativa.',
                 'due_date' => now()->addDays(2),
-                'status' => 'reviewing',
+                'status' => 'completed',
             ]),
         ]);
 
-        foreach ($classes[0]->students as $student) {
-            AssignmentSubmission::query()->create([
-                'assignment_id' => $assignments[0]->id,
-                'student_id' => $student->id,
-                'status' => $student->id === $students[0]->id ? 'submitted' : 'pending',
-                'grade' => $student->id === $students[0]->id ? 9.2 : null,
-                'teacher_feedback' => $student->id === $students[0]->id ? 'Muito boa organização de ideias.' : null,
-            ]);
-        }
+        $assignments[0]->submissions()->createMany([
+            [
+                'student_id' => $students[0]->id,
+                'status' => 'submitted',
+                'grade' => 9.2,
+                'teacher_feedback' => 'Muito boa organizacao de ideias.',
+            ],
+            [
+                'student_id' => $students[1]->id,
+                'status' => 'pending',
+                'grade' => null,
+                'teacher_feedback' => null,
+            ],
+        ]);
 
-        foreach ($classes[1]->students as $student) {
-            AssignmentSubmission::query()->create([
-                'assignment_id' => $assignments[1]->id,
-                'student_id' => $student->id,
+        $assignments[1]->submissions()->createMany([
+            [
+                'student_id' => $students[2]->id,
                 'status' => 'submitted',
                 'grade' => null,
                 'teacher_feedback' => null,
-            ]);
-        }
+            ],
+            [
+                'student_id' => $students[3]->id,
+                'status' => 'submitted',
+                'grade' => null,
+                'teacher_feedback' => null,
+            ],
+        ]);
 
         Evaluation::query()->create([
+            'organization_id' => $organizationId,
             'student_id' => $students[0]->id,
             'school_class_id' => $classes[0]->id,
             'title' => 'Speaking checkpoint',
@@ -191,33 +292,37 @@ class EducaProSeeder extends Seeder
         ]);
 
         Evaluation::query()->create([
+            'organization_id' => $organizationId,
             'student_id' => $students[3]->id,
             'school_class_id' => $classes[1]->id,
             'title' => 'Listening checkpoint',
             'skill' => 'listening',
             'score' => 7.1,
-            'feedback' => 'Precisa revisar inferência em áudios mais rápidos.',
+            'feedback' => 'Precisa revisar inferencia em audios mais rapidos.',
             'evaluated_at' => now()->subDays(10)->toDateString(),
         ]);
 
         PedagogicalNote::query()->create([
             'user_id' => $user->id,
+            'organization_id' => $organizationId,
             'student_id' => $students[0]->id,
             'category' => 'strength',
-            'note' => 'Tem boa iniciativa para puxar conversa em inglês.',
+            'note' => 'Tem boa iniciativa para puxar conversa em ingles.',
             'noted_at' => now()->subDays(3),
         ]);
 
         PedagogicalNote::query()->create([
             'user_id' => $user->id,
+            'organization_id' => $organizationId,
             'student_id' => $students[3]->id,
             'category' => 'attention',
-            'note' => 'Precisa de reforço nas estruturas para opinião.',
+            'note' => 'Precisa de reforco nas estruturas para opiniao.',
             'noted_at' => now()->subDays(5),
         ]);
 
         AgendaItem::query()->create([
             'user_id' => $user->id,
+            'organization_id' => $organizationId,
             'school_class_id' => $classes[0]->id,
             'title' => 'Teens B1 - aula com storytelling',
             'starts_at' => now()->addDay()->setTime(19, 0),
@@ -228,6 +333,7 @@ class EducaProSeeder extends Seeder
 
         AgendaItem::query()->create([
             'user_id' => $user->id,
+            'organization_id' => $organizationId,
             'school_class_id' => $classes[1]->id,
             'title' => 'Corrigir audios de homework',
             'starts_at' => now()->addDay()->setTime(17, 30),
@@ -238,10 +344,11 @@ class EducaProSeeder extends Seeder
 
         AgendaItem::query()->create([
             'user_id' => $user->id,
-            'title' => 'Planejar aula particular de sexta',
+            'organization_id' => $organizationId,
+            'title' => 'Planejar encontro individual de sexta',
             'starts_at' => now()->addDays(2)->setTime(14, 0),
             'ends_at' => now()->addDays(2)->setTime(15, 0),
-            'type' => 'planning',
+            'type' => 'reminder',
             'is_completed' => false,
         ]);
     }

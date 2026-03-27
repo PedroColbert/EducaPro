@@ -1,19 +1,68 @@
 import { LucideIcon } from 'lucide-react';
 
 export type AppTab = 'dashboard' | 'alunos' | 'turmas' | 'planejamento' | 'materiais' | 'atividades' | 'agenda' | 'desempenho';
+export type UserRole = 'admin' | 'coordinator' | 'teacher';
+export type AppProfile = UserRole | 'student' | 'guardian';
 
 export interface AuthUser {
     id: number;
     name: string;
+    display_name?: string | null;
     email: string;
+    role?: UserRole | null;
+    avatar?: string | null;
+    organization_name?: string | null;
+    organization_unit_name?: string | null;
 }
 
-export interface SharedPageProps {
+export interface GuardianAuthUser {
+    id: number;
+    name: string;
+    email: string;
+    relationship_label?: string | null;
+    organization_name?: string | null;
+    organization_unit_name?: string | null;
+}
+
+export interface StudentAuthUser {
+    id: number;
+    name: string;
+    email: string;
+    level?: string | null;
+    organization_name?: string | null;
+    organization_unit_name?: string | null;
+}
+
+export interface AppLabels {
+    students: string;
+    classes: string;
+    lessonPlans: string;
+    materials: string;
+    activities: string;
+    agenda: string;
+    reports: string;
+}
+
+export interface AppContext {
+    productName: string;
+    organizationName: string | null;
+    organizationCategory: string | null;
+    organizationUnitName?: string | null;
+    locale: string;
+    timezone: string;
+    profile: AppProfile | null;
+    labels: AppLabels;
+}
+
+export interface SharedPageProps extends Record<string, unknown> {
     app: {
         name: string;
+        context: AppContext;
     };
     auth: {
         user: AuthUser | null;
+        guardian?: GuardianAuthUser | null;
+        student?: StudentAuthUser | null;
     };
     errors: Record<string, string>;
 }
@@ -22,6 +71,8 @@ export interface CurrentUser {
     name: string;
     role: string;
     avatar: string;
+    organizationName?: string | null;
+    organizationUnitName?: string | null;
 }
 
 export interface SummaryMetric {
@@ -79,6 +130,9 @@ export interface CourseClass {
     id: number;
     name: string;
     level: string;
+    subjectId: number | null;
+    deliveryMode: 'in_person' | 'online' | 'hybrid';
+    audienceType: 'group' | 'individual';
     schedule: string;
     progress: number;
     nextTopic: string;
@@ -90,6 +144,9 @@ export interface CourseClass {
 export interface CourseClassDraft {
     name: string;
     level: string;
+    subjectId: number | null;
+    deliveryMode: 'in_person' | 'online' | 'hybrid';
+    audienceType: 'group' | 'individual';
     schedule: string;
     progress: number;
     nextTopic: string;
@@ -207,6 +264,12 @@ export interface AttendanceSession {
     entries: AttendanceEntry[];
 }
 
+export interface Subject {
+    id: number;
+    name: string;
+    code?: string;
+}
+
 export interface NavigationItem {
     id: AppTab;
     label: string;
@@ -214,6 +277,7 @@ export interface NavigationItem {
 }
 
 export interface EducaProState {
+    subjects: Subject[];
     students: Student[];
     classes: CourseClass[];
     materials: Material[];

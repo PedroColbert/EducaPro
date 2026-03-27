@@ -191,7 +191,7 @@ export default function MaterialsPage() {
             <ModalShell
                 open={Boolean(selectedMaterial)}
                 title={selectedMaterial?.title ?? 'Material'}
-                description={selectedMaterial ? `${selectedMaterial.category} • ${selectedMaterial.level}` : undefined}
+                description={selectedMaterial ? `${selectedMaterial.category} / ${selectedMaterial.level}` : undefined}
                 onClose={() => setSelectedMaterial(null)}
             >
                 {selectedMaterial ? (

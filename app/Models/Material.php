@@ -13,6 +13,7 @@ class Material extends Model
 
     protected $fillable = [
         'user_id',
+        'organization_id',
         'title',
         'type',
         'category',
@@ -31,6 +32,11 @@ class Material extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class);
     }
 
     public function lessonPlans(): BelongsToMany

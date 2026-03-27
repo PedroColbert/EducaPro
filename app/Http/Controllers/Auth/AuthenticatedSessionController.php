@@ -26,9 +26,20 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
+        auth('guardian')->logout();
+        auth('student')->logout();
+
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $user = $request->user();
+
+        $targetRoute = match ($user?->role) {
+            'admin' => 'admin.dashboard',
+            'coordinator' => 'coordinator.dashboard',
+            default => 'teacher.dashboard',
+        };
+
+        return redirect()->intended(route($targetRoute, absolute: false));
     }
 
     public function destroy(Request $request): RedirectResponse

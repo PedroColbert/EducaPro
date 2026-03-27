@@ -18,12 +18,14 @@ import {
     MaterialDraft,
     Student,
     StudentDraft,
+    Subject,
 } from '@/types';
 
-const STORAGE_KEY = 'educapro.prototype.state.v2';
+const STORAGE_KEY = 'educapro.prototype.state.v4';
 
 interface EducaProContextValue {
     state: EducaProState;
+    subjects: Subject[];
     students: Student[];
     classes: CourseClass[];
     materials: Material[];
@@ -94,6 +96,7 @@ export function EducaProProvider({ children }: PropsWithChildren) {
 
     const value = useMemo<EducaProContextValue>(() => {
         const saveStudent = async (draft: StudentDraft, studentId?: number) => {
+            const existingStudent = studentId ? state.students.find((student) => student.id === studentId) : undefined;
             const student: Student = {
                 id: studentId ?? nextId(state.students),
                 initials: buildInitials(draft.name),
@@ -106,9 +109,12 @@ export function EducaProProvider({ children }: PropsWithChildren) {
                 students: upsertById(previous.students, student),
                 classes: previous.classes.map((courseClass) => ({
                     ...courseClass,
-                    studentIds: draft.classIds.includes(courseClass.id)
-                        ? Array.from(new Set([...courseClass.studentIds.filter((id) => id !== student.id), student.id]))
-                        : courseClass.studentIds.filter((id) => id !== student.id),
+                    studentIds:
+                        draft.classIds.includes(courseClass.id)
+                            ? Array.from(new Set([...courseClass.studentIds, student.id]))
+                            : existingStudent?.classIds.includes(courseClass.id)
+                              ? courseClass.studentIds.filter((id) => id !== student.id)
+                              : courseClass.studentIds,
                 })),
             }));
 
@@ -116,6 +122,7 @@ export function EducaProProvider({ children }: PropsWithChildren) {
         };
 
         const saveClass = async (draft: CourseClassDraft, classId?: number) => {
+            const existingClass = classId ? state.classes.find((courseClass) => courseClass.id === classId) : undefined;
             const courseClass: CourseClass = {
                 id: classId ?? nextId(state.classes),
                 ...draft,
@@ -126,9 +133,12 @@ export function EducaProProvider({ children }: PropsWithChildren) {
                 classes: upsertById(previous.classes, courseClass),
                 students: previous.students.map((student) => ({
                     ...student,
-                    classIds: draft.studentIds.includes(student.id)
-                        ? Array.from(new Set([...student.classIds.filter((id) => id !== courseClass.id), courseClass.id]))
-                        : student.classIds.filter((id) => id !== courseClass.id),
+                    classIds:
+                        draft.studentIds.includes(student.id)
+                            ? Array.from(new Set([...student.classIds, courseClass.id]))
+                            : existingClass?.studentIds.includes(student.id)
+                              ? student.classIds.filter((id) => id !== courseClass.id)
+                              : student.classIds,
                 })),
             }));
 
@@ -156,16 +166,21 @@ export function EducaProProvider({ children }: PropsWithChildren) {
                 return null;
             }
 
-            const duplicated: LessonPlan = {
-                ...existing,
-                id: nextId(state.lessonPlans),
-                status: 'draft',
-                topic: `${existing.topic} (Copia)`,
-            };
+            let duplicated: LessonPlan | null = null;
 
             setState((previous) => ({
+                ...(() => {
+                    duplicated = {
+                        ...existing,
+                        id: nextId(previous.lessonPlans),
+                        status: 'draft',
+                        topic: `${existing.topic} (Copia)`,
+                    };
+
+                    return previous;
+                })(),
                 ...previous,
-                lessonPlans: [...previous.lessonPlans, duplicated],
+                lessonPlans: duplicated ? [...previous.lessonPlans, duplicated] : previous.lessonPlans,
             }));
 
             return duplicated;
@@ -195,26 +210,43 @@ export function EducaProProvider({ children }: PropsWithChildren) {
         };
 
         const saveActivity = async (draft: ActivityDraft, activityId?: number) => {
-            const existing = state.activities.find((activity) => activity.id === activityId);
-            const classId = draft.classId;
-            const relatedStudents = classId !== null ? state.students.filter((student) => student.classIds.includes(classId)) : [];
-            const activity: Activity = {
-                id: activityId ?? nextId(state.activities),
-                submissions:
-                    existing?.submissions ??
-                    relatedStudents.map((student) => ({
-                        studentId: student.id,
-                        status: 'pending',
-                        feedback: '',
-                        grade: '',
-                    })),
-                ...draft,
-            };
+            let activity: Activity | null = null;
 
             setState((previous) => ({
+                ...(() => {
+                    const existing = activityId ? previous.activities.find((entry) => entry.id === activityId) : undefined;
+                    const relatedStudents =
+                        draft.classId !== null ? previous.students.filter((student) => student.classIds.includes(draft.classId as number)) : [];
+                    const existingMap = new Map((existing?.submissions ?? []).map((submission) => [submission.studentId, submission]));
+                    const submissions: ActivitySubmission[] = relatedStudents.map((student) => {
+                        const persisted = existingMap.get(student.id);
+
+                        return (
+                            persisted ?? {
+                                studentId: student.id,
+                                status: 'pending',
+                                feedback: '',
+                                grade: '',
+                            }
+                        );
+                    });
+
+                    const createdActivity: Activity = {
+                        id: activityId ?? nextId(previous.activities),
+                        ...draft,
+                        submissions: draft.classId === null ? existing?.submissions ?? [] : submissions,
+                    };
+                    activity = createdActivity;
+
+                    return previous;
+                })(),
                 ...previous,
-                activities: upsertById(previous.activities, activity),
+                activities: activity ? upsertById(previous.activities, activity) : previous.activities,
             }));
+
+            if (!activity) {
+                throw new Error('Nao foi possivel salvar a atividade.');
+            }
 
             return activity;
         };
@@ -273,27 +305,34 @@ export function EducaProProvider({ children }: PropsWithChildren) {
                 entries,
             };
 
-            const updatedStudents = state.students.map((student) => {
-                if (!entries.some((entry) => entry.studentId === student.id)) {
-                    return student;
-                }
-
-                const sessionsForStudent = state.attendanceSessions
-                    .filter((entry) => entry.classId === classId && entry.id !== existing?.id)
-                    .flatMap((entry) => entry.entries.filter((item) => item.studentId === student.id));
-                const allEntries = [...sessionsForStudent, ...entries.filter((entry) => entry.studentId === student.id)];
-                const positiveEntries = allEntries.filter((entry) => entry.status === 'present' || entry.status === 'late' || entry.status === 'justified').length;
-
-                return {
-                    ...student,
-                    attendanceRate: allEntries.length ? Math.round((positiveEntries / allEntries.length) * 100) : student.attendanceRate,
-                };
-            });
-
             setState((previous) => ({
-                ...previous,
-                attendanceSessions: upsertById(previous.attendanceSessions, session),
-                students: updatedStudents,
+                ...(() => {
+                    const previousSessions = upsertById(previous.attendanceSessions, session);
+                    const updatedStudents = previous.students.map((student) => {
+                        const studentEntries = previousSessions
+                            .filter((entry) => entry.classId === classId)
+                            .flatMap((entry) => entry.entries.filter((item) => item.studentId === student.id));
+
+                        if (!studentEntries.length) {
+                            return student;
+                        }
+
+                        const positiveEntries = studentEntries.filter(
+                            (entry) => entry.status === 'present' || entry.status === 'late' || entry.status === 'justified',
+                        ).length;
+
+                        return {
+                            ...student,
+                            attendanceRate: Math.round((positiveEntries / studentEntries.length) * 100),
+                        };
+                    });
+
+                    return {
+                        ...previous,
+                        attendanceSessions: previousSessions,
+                        students: updatedStudents,
+                    };
+                })(),
             }));
 
             return session;
@@ -308,6 +347,7 @@ export function EducaProProvider({ children }: PropsWithChildren) {
 
         return {
             state,
+            subjects: state.subjects,
             students: state.students,
             classes: state.classes,
             materials: state.materials,

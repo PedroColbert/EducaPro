@@ -54,12 +54,12 @@ export default function LessonPlansPage() {
         setIsSaving(false);
     };
 
-    const handleDuplicate = async () => {
-        if (!selectedPlanId) {
+    const handleDuplicate = async (planId = selectedPlanId) => {
+        if (!planId) {
             return;
         }
 
-        const duplicated = await duplicateLessonPlan(selectedPlanId);
+        const duplicated = await duplicateLessonPlan(planId);
 
         if (duplicated) {
             setSelectedPlanId(duplicated.id);
@@ -93,8 +93,7 @@ export default function LessonPlansPage() {
                                 classLabel={classes.find((courseClass) => courseClass.id === plan.classId)?.name ?? 'Sem turma'}
                                 onSelect={() => setSelectedPlanId(plan.id)}
                                 onDuplicate={() => {
-                                    setSelectedPlanId(plan.id);
-                                    void handleDuplicate();
+                                    void handleDuplicate(plan.id);
                                 }}
                             />
                         ))

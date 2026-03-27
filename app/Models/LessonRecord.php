@@ -13,6 +13,7 @@ class LessonRecord extends Model
 
     protected $fillable = [
         'user_id',
+        'organization_id',
         'school_class_id',
         'lesson_plan_id',
         'taught_on',
@@ -32,6 +33,11 @@ class LessonRecord extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class);
     }
 
     public function schoolClass(): BelongsTo

@@ -5,12 +5,14 @@ import { CourseClass } from '@/types';
 
 export default function ClassCard({
     courseClass,
+    subjectLabel,
     studentCount,
     onEdit,
     onOpenDetails,
     onTakeAttendance,
 }: {
     courseClass: CourseClass;
+    subjectLabel: string;
     studentCount: number;
     onEdit: () => void;
     onOpenDetails: () => void;
@@ -24,6 +26,7 @@ export default function ClassCard({
                     <p className="mt-1 flex items-center gap-1 text-sm text-slate-500">
                         <Calendar size={14} /> {courseClass.schedule}
                     </p>
+                    <p className="mt-1 text-xs text-slate-400">{subjectLabel}</p>
                 </div>
                 <button className="text-slate-400 hover:text-slate-600" onClick={onEdit}>
                     <MoreVertical size={20} />

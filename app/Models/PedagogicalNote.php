@@ -12,6 +12,7 @@ class PedagogicalNote extends Model
 
     protected $fillable = [
         'user_id',
+        'organization_id',
         'student_id',
         'note',
         'category',
@@ -28,6 +29,11 @@ class PedagogicalNote extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class);
     }
 
     public function student(): BelongsTo

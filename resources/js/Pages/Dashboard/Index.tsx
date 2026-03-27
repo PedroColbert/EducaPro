@@ -5,7 +5,8 @@ import QuickActions from '@/Components/Features/Dashboard/QuickActions';
 import ReportsOverview from '@/Components/Features/Dashboard/ReportsOverview';
 import SummaryMetrics from '@/Components/Features/Dashboard/SummaryMetrics';
 import TodayClasses from '@/Components/Features/Dashboard/TodayClasses';
-import { currentUser, dashboardIconMeta } from '@/data/mockData';
+import { dashboardIconMeta } from '@/data/mockData';
+import { useAppContext } from '@/hooks/useAppContext';
 import { useEducaPro } from '@/hooks/useEducaPro';
 import { Activity, AgendaItem, AppTab, LessonPlan, Student } from '@/types';
 
@@ -31,6 +32,7 @@ function daysBetween(referenceDate: Date, target: string) {
 }
 
 export default function DashboardPage({ changeTab }: { changeTab: (tabId: AppTab) => void }) {
+    const { currentUser, appContext } = useAppContext();
     const { students, classes, activities, agendaItems, lessonPlans, getClassById, getStudentsForClass } = useEducaPro();
 
     const orderedAgenda = [...agendaItems].sort((left, right) => left.startsAt.localeCompare(right.startsAt));
@@ -112,14 +114,14 @@ export default function DashboardPage({ changeTab }: { changeTab: (tabId: AppTab
             <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-800">Bom dia, {currentUser.name.split(' ')[0]}!</h1>
-                    <p className="mt-1 text-slate-500">Aqui esta um resumo vivo da sua rotina pedagogica.</p>
+                    <p className="mt-1 text-slate-500">{profileSummary(appContext.profile)}</p>
                 </div>
                 <button
                     onClick={() => changeTab('planejamento')}
                     className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 font-medium text-white shadow-sm shadow-indigo-200 transition-colors hover:bg-indigo-700"
                 >
                     <Plus size={18} />
-                    <span>Novo plano de aula</span>
+                    <span>Novo item de {appContext.labels.lessonPlans.toLowerCase()}</span>
                 </button>
             </div>
 
@@ -135,6 +137,17 @@ export default function DashboardPage({ changeTab }: { changeTab: (tabId: AppTab
             </div>
         </div>
     );
+}
+
+function profileSummary(profile: string | null) {
+    switch (profile) {
+        case 'admin':
+            return 'Aqui esta uma leitura rapida da operacao escolar, com foco em visao institucional e acompanhamento geral.';
+        case 'coordinator':
+            return 'Aqui esta um resumo da coordenacao, com sinais pedagogicos, turmas e pontos de acompanhamento.';
+        default:
+            return 'Aqui esta um resumo vivo da sua operacao academica.';
+    }
 }
 
 function buildPedagogicalInsights({

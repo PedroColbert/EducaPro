@@ -1,0 +1,30 @@
+EDUCAPRO - USUARIOS DE TESTE
+
+Ambiente local:
+- URL principal da equipe: http://127.0.0.1:8000/login
+- URL do estudante: http://127.0.0.1:8000/student/login
+- URL da familia: http://127.0.0.1:8000/family/login
+
+1. Administracao
+- Email: admin@educapro.com
+- Senha: 12345678
+
+2. Coordenacao
+- Email: coordenacao@educapro.com
+- Senha: 12345678
+
+3. Professor
+- Email: professor@educapro.com
+- Senha: 12345678
+
+4. Estudante
+- Email: aluno@educapro.com
+- Senha: 12345678
+
+5. Responsavel
+- Email: familia@educapro.com
+- Senha: 12345678
+
+Observacoes:
+- Essas credenciais sao recriadas pelo fluxo de seed local.
+- Se necessario, rode: php artisan migrate:fresh --seed

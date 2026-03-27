@@ -1,6 +1,9 @@
 import { PropsWithChildren } from 'react';
 
+import { usePage } from '@inertiajs/react';
 import { BookOpen, CheckCircle2 } from 'lucide-react';
+
+import { SharedPageProps } from '@/types';
 
 interface AuthLayoutProps extends PropsWithChildren {
     title: string;
@@ -8,12 +11,15 @@ interface AuthLayoutProps extends PropsWithChildren {
 }
 
 const highlights = [
-    'Diario de classe e chamadas em segundos',
-    'Gestao visual de notas e tarefas',
-    'Biblioteca pessoal de materiais sempre a mao',
+    'Registros de aula e presenca em segundos',
+    'Acompanhamento visual de pendencias e desempenho',
+    'Biblioteca de recursos pronta para diferentes contextos',
 ];
 
 export default function AuthLayout({ title, description, children }: AuthLayoutProps) {
+    const { props } = usePage<SharedPageProps>();
+    const productName = props.app.context.productName;
+
     return (
         <div className="flex min-h-screen bg-slate-50 font-sans selection:bg-indigo-100 selection:text-indigo-900">
             <div className="relative hidden overflow-hidden bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 p-12 lg:flex lg:w-1/2 lg:flex-col lg:justify-between">
@@ -27,7 +33,7 @@ export default function AuthLayout({ title, description, children }: AuthLayoutP
                         <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/20 bg-white/20 shadow-lg backdrop-blur-md">
                             <BookOpen size={24} className="text-white" />
                         </div>
-                        <span className="text-2xl font-bold tracking-tight text-white">EducaPro</span>
+                        <span className="text-2xl font-bold tracking-tight text-white">{productName}</span>
                     </div>
                 </div>
 
@@ -38,8 +44,8 @@ export default function AuthLayout({ title, description, children }: AuthLayoutP
                         mais leve e organizada.
                     </h1>
                     <p className="mb-8 text-lg leading-relaxed text-indigo-100">
-                        Um espaco pensado exclusivamente para facilitar o dia a dia da professora. Planeje aulas,
-                        acompanhe alunos e ganhe tempo.
+                        Um espaco flexivel para planejar encontros, acompanhar participantes e organizar a rotina
+                        academica com clareza.
                     </p>
 
                     <div className="space-y-4">
@@ -53,7 +59,7 @@ export default function AuthLayout({ title, description, children }: AuthLayoutP
                 </div>
 
                 <div className="relative z-10 text-sm text-indigo-200/80">
-                    &copy; {new Date().getFullYear()} EducaPro. Todos os direitos reservados.
+                    &copy; {new Date().getFullYear()} {productName}. Todos os direitos reservados.
                 </div>
             </div>
 
@@ -63,9 +69,7 @@ export default function AuthLayout({ title, description, children }: AuthLayoutP
                         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 shadow-md">
                             <BookOpen size={24} className="text-white" />
                         </div>
-                        <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-2xl font-bold text-transparent">
-                            EducaPro
-                        </span>
+                        <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-2xl font-bold text-transparent">{productName}</span>
                     </div>
 
                     <div className="mb-10 text-center lg:text-left">

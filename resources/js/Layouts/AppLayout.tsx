@@ -5,6 +5,7 @@ import { Topbar } from '@/Components/Shared/Topbar';
 import { AppTab, CurrentUser, NavigationItem } from '@/types';
 
 interface AppLayoutProps extends PropsWithChildren {
+    appName: string;
     currentUser: CurrentUser;
     navigation: NavigationItem[];
     activeTab: AppTab;
@@ -15,6 +16,7 @@ interface AppLayoutProps extends PropsWithChildren {
 }
 
 export default function AppLayout({
+    appName,
     currentUser,
     navigation,
     activeTab,
@@ -31,6 +33,7 @@ export default function AppLayout({
             ) : null}
 
             <Sidebar
+                appName={appName}
                 currentUser={currentUser}
                 navigation={navigation}
                 activeTab={activeTab}
