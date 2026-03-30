@@ -34,6 +34,7 @@ function daysBetween(referenceDate: Date, target: string) {
 export default function DashboardPage({ changeTab }: { changeTab: (tabId: AppTab) => void }) {
     const { currentUser, appContext } = useAppContext();
     const { students, classes, activities, agendaItems, lessonPlans, getClassById, getStudentsForClass } = useEducaPro();
+    const primaryAction = getPrimaryAction(appContext.profile, appContext.labels);
 
     const orderedAgenda = [...agendaItems].sort((left, right) => left.startsAt.localeCompare(right.startsAt));
     const referenceDate = orderedAgenda.length ? new Date(orderedAgenda[0].startsAt) : new Date();
@@ -116,13 +117,15 @@ export default function DashboardPage({ changeTab }: { changeTab: (tabId: AppTab
                     <h1 className="text-2xl font-bold text-slate-800">Bom dia, {currentUser.name.split(' ')[0]}!</h1>
                     <p className="mt-1 text-slate-500">{profileSummary(appContext.profile)}</p>
                 </div>
-                <button
-                    onClick={() => changeTab('planejamento')}
-                    className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 font-medium text-white shadow-sm shadow-indigo-200 transition-colors hover:bg-indigo-700"
-                >
-                    <Plus size={18} />
-                    <span>Novo item de {appContext.labels.lessonPlans.toLowerCase()}</span>
-                </button>
+                {primaryAction ? (
+                    <button
+                        onClick={() => changeTab(primaryAction.tab)}
+                        className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 font-medium text-white shadow-sm shadow-indigo-200 transition-colors hover:bg-indigo-700"
+                    >
+                        <Plus size={18} />
+                        <span>{primaryAction.label}</span>
+                    </button>
+                ) : null}
             </div>
 
             <SummaryMetrics metrics={summaryMetrics} />
@@ -147,6 +150,29 @@ function profileSummary(profile: string | null) {
             return 'Aqui esta um resumo da coordenacao, com sinais pedagogicos, turmas e pontos de acompanhamento.';
         default:
             return 'Aqui esta um resumo vivo da sua operacao academica.';
+    }
+}
+
+function getPrimaryAction(
+    profile: string | null,
+    labels: { lessonPlans: string; reports: string },
+) {
+    switch (profile) {
+        case 'admin':
+            return {
+                tab: 'desempenho' as const,
+                label: `Abrir ${labels.reports.toLowerCase()}`,
+            };
+        case 'coordinator':
+            return {
+                tab: 'planejamento' as const,
+                label: `Revisar ${labels.lessonPlans.toLowerCase()}`,
+            };
+        default:
+            return {
+                tab: 'planejamento' as const,
+                label: `Novo item de ${labels.lessonPlans.toLowerCase()}`,
+            };
     }
 }
 

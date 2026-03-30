@@ -21,6 +21,7 @@ class HandleInertiaRequests extends Middleware
         $guardian = auth('guardian')->user()?->loadMissing('organization', 'organizationUnit');
         $student = auth('student')->user()?->loadMissing('organization', 'organizationUnit');
         $actor = $user ?? $guardian ?? $student;
+        $productName = $this->resolveProductName();
         $organizationSettings = data_get($actor?->organization, 'settings', []);
         $userSettings = data_get($user, 'settings', []) ?: data_get($student, 'settings', []);
 
@@ -37,9 +38,9 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'app' => [
-                'name' => config('app.name', 'EducaPro'),
+                'name' => $productName,
                 'context' => [
-                    'productName' => config('app.name', 'EducaPro'),
+                    'productName' => $productName,
                     'organizationName' => $actor?->organization?->name,
                     'organizationCategory' => $actor?->organization?->category,
                     'organizationUnitName' => $actor?->organizationUnit?->name,
@@ -59,6 +60,15 @@ class HandleInertiaRequests extends Middleware
                 'student' => $this->resolveStudent($student),
             ],
         ];
+    }
+
+    protected function resolveProductName(): string
+    {
+        $configuredName = (string) config('app.name', 'EducaPro');
+
+        return blank($configuredName) || $configuredName === 'Laravel'
+            ? 'EducaPro'
+            : $configuredName;
     }
 
     protected function resolveAuthUser(?Authenticatable $user): ?array

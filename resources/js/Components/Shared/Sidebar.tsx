@@ -31,15 +31,26 @@ export function Sidebar({
                 isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
             }`}
         >
-            <div className="flex h-20 cursor-pointer items-center border-b border-slate-50 px-6" onClick={() => onChangeTab('dashboard')}>
+            <button
+                type="button"
+                className="flex h-20 items-center border-b border-slate-50 px-6 text-left"
+                onClick={() => {
+                    onChangeTab('dashboard');
+                    onCloseMobileMenu();
+                }}
+                aria-label={`Voltar para a dashboard do ${appName}`}
+            >
                 <div className="mr-3 flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 shadow-md shadow-indigo-200">
                     <BookOpen size={18} className="text-white" />
                 </div>
                 <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-xl font-bold text-transparent">{appName}</span>
-                <button className="ml-auto text-slate-400 hover:text-slate-600 md:hidden" onClick={onCloseMobileMenu}>
+                <span className="ml-3 hidden rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-medium text-indigo-700 lg:inline-flex">
+                    Workspace
+                </span>
+                <span className="ml-auto text-slate-400 md:hidden">
                     <X size={20} />
-                </button>
-            </div>
+                </span>
+            </button>
 
             <div className="flex-1 space-y-1 overflow-y-auto px-4 py-6">
                 <div className="mb-4 px-4 text-xs font-semibold uppercase tracking-wider text-slate-400">Menu Principal</div>
@@ -83,18 +94,7 @@ export function Sidebar({
                         <LogOut size={16} />
                     </button>
                 </div>
-
-                <button
-                    type="button"
-                    onClick={() => post('/logout')}
-                    disabled={processing}
-                    className={`mt-3 inline-flex items-center gap-1.5 px-2 text-xs font-medium transition ${
-                        processing ? 'cursor-wait text-slate-400' : 'text-slate-500 hover:text-rose-600'
-                    }`}
-                >
-                    <LogOut size={14} />
-                    <span>{processing ? 'Saindo...' : 'Sair'}</span>
-                </button>
+                <p className="mt-3 px-2 text-xs text-slate-400">{processing ? 'Encerrando sessao...' : 'Ambiente autenticado da equipe.'}</p>
             </div>
         </aside>
     );

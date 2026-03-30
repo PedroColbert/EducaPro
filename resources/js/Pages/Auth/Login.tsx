@@ -40,7 +40,7 @@ export default function Login({ canResetPassword, forgotPasswordUrl, requestAcce
     };
 
     return (
-        <AuthLayout title="Bem-vinda de volta!" description="Insira suas credenciais para acessar seu painel.">
+        <AuthLayout title="Que bom te ver novamente" description="Insira suas credenciais para acessar seu painel com seguranca e clareza.">
             <Head title="Entrar" />
 
             <form onSubmit={submit} className="space-y-6" noValidate>
@@ -117,7 +117,7 @@ export default function Login({ canResetPassword, forgotPasswordUrl, requestAcce
                             type={showPassword ? 'text' : 'password'}
                             value={data.password}
                             onChange={(event) => setData('password', event.target.value)}
-                            placeholder="••••••••"
+                            placeholder="********"
                             autoComplete="current-password"
                             required
                             aria-invalid={errors.password ? 'true' : 'false'}

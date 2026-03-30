@@ -1,4 +1,4 @@
-import { Calendar, FileText, Folder, Plus, TrendingUp, Users } from 'lucide-react';
+import { BookOpen, Calendar, ClipboardCheck, FileText, Folder, TrendingUp, Users } from 'lucide-react';
 
 import Card from '@/Components/UI/Card';
 import { useAppContext } from '@/hooks/useAppContext';
@@ -35,8 +35,8 @@ function getQuickActions(profile: string | null) {
     if (profile === 'admin') {
         return [
             { tab: 'alunos' as const, label: 'Ver estudantes', icon: Users, iconClass: 'text-indigo-500', hoverClass: 'hover:bg-indigo-50 hover:text-indigo-700' },
-            { tab: 'turmas' as const, label: 'Ver turmas', icon: Calendar, iconClass: 'text-emerald-500', hoverClass: 'hover:bg-emerald-50 hover:text-emerald-700' },
-            { tab: 'agenda' as const, label: 'Agenda escolar', icon: Folder, iconClass: 'text-blue-500', hoverClass: 'hover:bg-blue-50 hover:text-blue-700' },
+            { tab: 'turmas' as const, label: 'Ver turmas', icon: BookOpen, iconClass: 'text-emerald-500', hoverClass: 'hover:bg-emerald-50 hover:text-emerald-700' },
+            { tab: 'agenda' as const, label: 'Agenda escolar', icon: Calendar, iconClass: 'text-blue-500', hoverClass: 'hover:bg-blue-50 hover:text-blue-700' },
             { tab: 'desempenho' as const, label: 'Relatorios', icon: TrendingUp, iconClass: 'text-rose-500', hoverClass: 'hover:bg-rose-50 hover:text-rose-700' },
         ];
     }
@@ -51,7 +51,7 @@ function getQuickActions(profile: string | null) {
     }
 
     return [
-        { tab: 'turmas' as const, label: 'Fazer chamada', icon: Plus, iconClass: 'text-indigo-500', hoverClass: 'hover:bg-indigo-50 hover:text-indigo-700' },
+        { tab: 'turmas' as const, label: 'Fazer chamada', icon: ClipboardCheck, iconClass: 'text-indigo-500', hoverClass: 'hover:bg-indigo-50 hover:text-indigo-700' },
         { tab: 'atividades' as const, label: 'Corrigir tarefas', icon: FileText, iconClass: 'text-emerald-500', hoverClass: 'hover:bg-emerald-50 hover:text-emerald-700' },
         { tab: 'materiais' as const, label: 'Materiais', icon: Folder, iconClass: 'text-blue-500', hoverClass: 'hover:bg-blue-50 hover:text-blue-700' },
         { tab: 'desempenho' as const, label: 'Relatorios', icon: TrendingUp, iconClass: 'text-rose-500', hoverClass: 'hover:bg-rose-50 hover:text-rose-700' },

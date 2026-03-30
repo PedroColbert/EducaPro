@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: educapro-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: HMGEDUCAPRO
+      POSTGRES_USER: HMGPEDRO
+      POSTGRES_PASSWORD: Pa220223*
+    ports:
+      - "5432:5432"
+    volumes:
+      - educapro-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  educapro-postgres-data:

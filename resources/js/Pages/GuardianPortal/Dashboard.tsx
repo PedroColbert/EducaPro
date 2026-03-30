@@ -5,6 +5,7 @@ import ChildSwitcher from '@/Components/Features/GuardianPortal/ChildSwitcher';
 import GuardianMetricCard from '@/Components/Features/GuardianPortal/GuardianMetricCard';
 import Badge from '@/Components/UI/Badge';
 import Card from '@/Components/UI/Card';
+import { EmptyState } from '@/Components/UI/EmptyState';
 import GuardianPortalLayout from '@/Layouts/GuardianPortalLayout';
 import { formatDate } from '@/lib/utils';
 
@@ -194,7 +195,7 @@ export default function GuardianDashboard(props: GuardianDashboardProps) {
                                             </div>
                                         ))
                                     ) : (
-                                        <p className="text-sm text-slate-500">Nenhuma atividade vinculada neste momento.</p>
+                                        <EmptyState title="Nenhuma atividade vinculada" description="Quando novas tarefas forem publicadas para este estudante, elas aparecerao aqui com prazo, status e feedback." />
                                     )}
                                 </div>
                             </Card>
@@ -215,7 +216,7 @@ export default function GuardianDashboard(props: GuardianDashboardProps) {
                                             </div>
                                         ))
                                     ) : (
-                                        <p className="text-sm text-slate-500">Nenhum compromisso proximo encontrado.</p>
+                                        <EmptyState title="Agenda tranquila" description="Nao ha compromissos proximos vinculados a este estudante no momento." />
                                     )}
                                 </div>
                             </Card>
@@ -241,7 +242,7 @@ export default function GuardianDashboard(props: GuardianDashboardProps) {
                                             </div>
                                         ))
                                     ) : (
-                                        <p className="text-sm text-slate-500">Ainda nao ha chamadas suficientes para exibir.</p>
+                                        <EmptyState title="Sem chamadas recentes" description="Quando novas presencas forem registradas, esta area mostrara o historico mais recente." />
                                     )}
                                 </div>
                             </Card>
@@ -264,7 +265,7 @@ export default function GuardianDashboard(props: GuardianDashboardProps) {
                                             </div>
                                         ))
                                     ) : (
-                                        <p className="text-sm text-slate-500">Nenhuma avaliacao registrada recentemente.</p>
+                                        <EmptyState title="Sem avaliacoes recentes" description="As proximas avaliacoes registradas para este estudante aparecerao aqui." />
                                     )}
                                 </div>
                             </Card>
@@ -279,14 +280,14 @@ export default function GuardianDashboard(props: GuardianDashboardProps) {
                                         notes.map((note) => (
                                             <div key={note.id} className="rounded-2xl border border-slate-100 p-4">
                                                 <div className="flex items-center justify-between gap-3">
-                                                    <p className="font-semibold text-slate-900">{note.category === 'attention' ? 'Ponto de atencao' : 'Registro pedagógico'}</p>
+                                                    <p className="font-semibold text-slate-900">{note.category === 'attention' ? 'Ponto de atencao' : 'Registro pedagogico'}</p>
                                                     <span className="text-xs text-slate-400">{formatDate(note.notedAt)}</span>
                                                 </div>
                                                 <p className="mt-2 text-sm leading-6 text-slate-600">{note.note}</p>
                                             </div>
                                         ))
                                     ) : (
-                                        <p className="text-sm text-slate-500">Nenhum recado importante registrado.</p>
+                                        <EmptyState title="Sem recados importantes" description="Avisos, orientacoes e observacoes relevantes vao aparecer aqui quando existirem." />
                                     )}
                                 </div>
                             </Card>
@@ -308,7 +309,9 @@ export default function GuardianDashboard(props: GuardianDashboardProps) {
                                         </div>
                                     ))
                                 ) : (
-                                    <p className="text-sm text-slate-500">Nenhum material recente compartilhado para este estudante.</p>
+                                    <div className="md:col-span-2 xl:col-span-4">
+                                        <EmptyState title="Sem materiais recentes" description="Os recursos compartilhados com este estudante aparecerao aqui conforme forem vinculados pela equipe." />
+                                    </div>
                                 )}
                             </div>
                         </Card>

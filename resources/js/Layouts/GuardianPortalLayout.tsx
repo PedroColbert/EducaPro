@@ -1,7 +1,7 @@
 import { PropsWithChildren } from 'react';
 
 import { Head, router, usePage } from '@inertiajs/react';
-import { Bell, LogOut, ShieldCheck } from 'lucide-react';
+import { LogOut, ShieldCheck } from 'lucide-react';
 
 import { SharedPageProps } from '@/types';
 
@@ -36,9 +36,9 @@ export default function GuardianPortalLayout({ title, subtitle, children }: Guar
                                 <p className="text-sm font-semibold text-slate-800">{guardian?.name}</p>
                                 <p className="text-xs text-slate-500">{guardian?.organization_name ?? 'Acompanhamento escolar'}</p>
                             </div>
-                            <button className="rounded-2xl border border-slate-200 bg-white p-3 text-slate-500 transition hover:border-indigo-200 hover:text-indigo-600">
-                                <Bell size={18} />
-                            </button>
+                            <div className="hidden rounded-2xl border border-indigo-100 bg-indigo-50 px-4 py-2 text-xs font-medium text-indigo-700 md:block">
+                                Leitura clara para a familia
+                            </div>
                             <button
                                 onClick={() => router.post('/family/logout')}
                                 className="flex items-center gap-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-slate-800"

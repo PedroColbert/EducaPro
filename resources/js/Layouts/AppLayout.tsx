@@ -43,7 +43,7 @@ export default function AppLayout({
             />
 
             <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-                <Topbar onOpenMobileMenu={onOpenMobileMenu} />
+                <Topbar activeTab={activeTab} currentUser={currentUser} onOpenMobileMenu={onOpenMobileMenu} />
 
                 <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
                     <div className="mx-auto max-w-7xl pb-10">{children}</div>

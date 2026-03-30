@@ -75,12 +75,12 @@ export default function GuardianLogin({ status }: { status?: string | null }) {
                             type={showPassword ? 'text' : 'password'}
                             value={data.password}
                             onChange={(event) => setData('password', event.target.value)}
-                            placeholder="••••••••"
+                            placeholder="********"
                             autoComplete="current-password"
                             required
                             className={cn('w-full rounded-xl border bg-white py-3 pl-10 pr-12 text-slate-700 shadow-sm transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20', errors.password ? 'border-rose-300 ring-2 ring-rose-500/10' : 'border-slate-200')}
                         />
-                        <button type="button" onClick={() => setShowPassword((value) => !value)} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 transition-colors hover:text-slate-600">
+                        <button type="button" onClick={() => setShowPassword((value) => !value)} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 transition-colors hover:text-slate-600" aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}>
                             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                         </button>
                     </div>
@@ -108,7 +108,7 @@ export default function GuardianLogin({ status }: { status?: string | null }) {
 
             <div className="mt-8 text-center">
                 <p className="text-sm text-slate-500">
-                    Acesso da equipe pedagógica?{' '}
+                    Acesso da equipe pedagogica?{' '}
                     <Link href="/login" className="font-semibold text-indigo-600 transition-colors hover:text-indigo-700">
                         Entrar no painel principal
                     </Link>
